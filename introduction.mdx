@@ -1,0 +1,85 @@
+---
+title: Introduction
+description: An open-source metadata specification and Python CLI toolkit for describing, organising, and sharing digital heritage from Dzaleka Refugee Camp.
+---
+
+The **Dzaleka Metadata Standard (DMS)** is an open-source metadata specification and toolkit designed to bring consistency, interoperability, and long-term reusability to digital heritage content from [Dzaleka Refugee Camp](https://en.wikipedia.org/wiki/Dzaleka_refugee_camp) in Malawi.
+
+DMS provides a structured schema for heritage items — from oral histories and poems to photographs, maps, and cultural sites — alongside Python-based tools to create, validate, search, and publish that metadata.
+
+## Why DMS exists
+
+Dzaleka is one of the largest refugee camps in sub-Saharan Africa and home to a rich and growing body of digital heritage content. Without a shared standard, that content risks becoming siloed, undiscoverable, and incompatible with broader archival systems.
+
+DMS addresses this by providing:
+
+- A **consistent schema** so every record is described the same way
+- **Validation tooling** so contributors can check their records before submission
+- **Linked data support** so records can participate in the wider semantic web
+- **Community-first design** so both technical systems and non-technical contributors can work with heritage content
+
+## Key capabilities
+
+<CardGroup cols={2}>
+  <Card title="Metadata schema" icon="file-json">
+    A machine-readable specification in JSON Schema (Draft 2020-12), YAML, and JSON-LD formats. Defines fields, types, constraints, and allowed values for all heritage records.
+  </Card>
+  <Card title="Python CLI" icon="terminal">
+    The `dms` command-line tool covers the full record lifecycle: create, validate, search, diff, convert, export, and report.
+  </Card>
+  <Card title="Web UI (DMS Vault)" icon="layout-dashboard">
+    A local browser-based interface launched with `dms web`. Provides a structured form with live validation feedback — no terminal required.
+  </Card>
+  <Card title="Linked data" icon="network">
+    The `dms.jsonld` context maps every DMS field to established vocabularies (Dublin Core, FOAF, BIBO, Schema.org, W3C Geo, SKOS) for semantic web publishing.
+  </Card>
+</CardGroup>
+
+## Supported heritage types
+
+Every DMS record has a `type` field that identifies the category of the heritage item. The ten supported types are:
+
+| Type | Description |
+|------|-------------|
+| `story` | Oral histories, personal narratives, and testimonies |
+| `photo` | Photographs and visual documentation |
+| `document` | Administrative records, reports, and written materials |
+| `audio` | Music recordings, spoken word, and sound archives |
+| `video` | Film, documentary, and video recordings |
+| `event` | Community events, ceremonies, and gatherings |
+| `map` | Geographic and spatial records of the camp and surroundings |
+| `artwork` | Murals, paintings, sculptures, and visual art |
+| `site` | Heritage sites, landmarks, and points of cultural significance |
+| `poem` | Poetry and literary works |
+
+## Dublin Core compatibility
+
+All DMS fields map directly to [Dublin Core Metadata Terms](https://www.dublincore.org/specifications/dublin-core/dcmi-terms/), ensuring broad interoperability with library systems, archives, and digital humanities platforms. The schema extends Dublin Core with Dzaleka-specific fields — such as camp area names and community-defined access levels — while preserving full compatibility with standard metadata harvesters.
+
+The linked data context (`dms.jsonld`) provides explicit mappings to six vocabularies:
+
+| Vocabulary | Prefix | Used for |
+|-----------|--------|----------|
+| Dublin Core | `dc:`, `dcterms:` | Core fields: title, creator, subject, rights |
+| FOAF | `foaf:` | Person and agent descriptions |
+| BIBO | `bibo:` | Bibliographic roles: editor, translator, interviewer |
+| Schema.org | `schema:` | Creative works, places, events, affiliations |
+| W3C Geo | `geo:` | Geographic coordinates |
+| SKOS | `skos:` | Subject vocabularies and concept schemes |
+
+## Where to go next
+
+<CardGroup cols={2}>
+  <Card title="Quick start" icon="rocket" href="/quickstart">
+    Install DMS and create your first validated heritage record in five minutes.
+  </Card>
+  <Card title="Installation" icon="download" href="/installation">
+    Full prerequisites, installation steps, and troubleshooting for all platforms.
+  </Card>
+  <Card title="Field guide" icon="book-open" href="/reference/field-guide">
+    Detailed definitions, allowed values, and guidelines for every schema field.
+  </Card>
+  <Card title="CLI reference" icon="terminal" href="/reference/commands/init">
+    Complete reference for all `dms` commands, flags, and usage examples.
+  </Card>
+</CardGroup>

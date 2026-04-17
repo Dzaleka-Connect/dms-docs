@@ -1,0 +1,107 @@
+---
+title: init
+description: Interactively create a new DMS metadata record through a guided CLI wizard.
+---
+
+## Synopsis
+
+```bash
+dms init [--type TYPE] [--output FILE]
+```
+
+## Description
+
+`dms init` launches an interactive wizard that walks you through every field of the Dzaleka Metadata Standard schema. The wizard prompts for required fields (title, type, description, language), then offers optional sections for creators, location, rights, and source provenance.
+
+At the end of the session the generated record is displayed as formatted JSON. You can save it to a path you supplied via `--output`, or accept the suggested filename (`TYPE_XXXXXXXX.json`) in the current directory.
+
+Press **Ctrl+C** at any prompt to cancel without saving.
+
+## Options
+
+<ParamField path="--type" type="string" default="None">
+  Pre-set the heritage type and skip the type-selection prompt. Must be one of the ten valid types. If the value you supply is not recognised, the wizard falls back to an interactive selection.
+
+  Valid values: `story`, `photo`, `document`, `audio`, `video`, `event`, `map`, `artwork`, `site`, `poem`
+</ParamField>
+
+<ParamField path="--output" type="path" default="None">
+  File path where the finished record will be saved. When omitted, the wizard proposes a filename derived from the record type and the first eight characters of its UUID (e.g., `poem_3f8a1c2b.json`) and asks for confirmation before writing.
+</ParamField>
+
+## Wizard walkthrough
+
+<Steps>
+  <Step title="Auto-generated ID">
+    A UUID v4 is generated automatically. You do not need to supply one.
+  </Step>
+  <Step title="Title">
+    Free-text title for the record. Required.
+  </Step>
+  <Step title="Type">
+    Select or confirm the heritage type. Skipped when `--type` is valid.
+  </Step>
+  <Step title="Description">
+    A summary of the artefact. Required.
+  </Step>
+  <Step title="Language">
+    BCP 47 language code (`en`, `sw`, `fr`, `rw`, …). Defaults to `en`.
+  </Step>
+  <Step title="Creator(s)">
+    Optionally add one or more creators with name, role, and affiliation.
+  </Step>
+  <Step title="Dates">
+    `date.created` is set to today automatically. Optionally provide an `event_date`.
+  </Step>
+  <Step title="Tags">
+    Comma-separated subject keywords stored as `subject[]`.
+  </Step>
+  <Step title="Location">
+    Optionally add a location name, area, and GPS coordinates.
+  </Step>
+  <Step title="Format">
+    MIME type of the source file, e.g. `image/jpeg` or `audio/mpeg`.
+  </Step>
+  <Step title="Rights">
+    License identifier (default `CC-BY-4.0`), access level, and rights holder.
+  </Step>
+  <Step title="Source">
+    Optional provenance: contributor name, collection name, original format.
+  </Step>
+</Steps>
+
+## Examples
+
+<CodeGroup>
+
+```bash Bare interactive session
+dms init
+```
+
+```bash Pre-set type
+dms init --type poem
+```
+
+```bash Specify output path
+dms init --output records/my-story.json
+```
+
+```bash Pre-set type and output
+dms init --type site --output records/dzaleka-market.json
+```
+
+</CodeGroup>
+
+## Notes
+
+<Tip>
+  Use `--type` when scripting record creation workflows or batch ingestion to avoid interactive prompts blocking automation.
+</Tip>
+
+<Note>
+  The wizard always writes `date.created` as today's ISO date. To change it, open the saved file and edit the `date.created` field directly, or add an `event_date` for a historical event date.
+</Note>
+
+<Warning>
+  If you run `dms init` without `--output` and decline the suggested filename, the record is printed to the terminal but **not saved to disk**.
+</Warning>

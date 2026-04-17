@@ -1,0 +1,129 @@
+---
+title: export
+description: Export DMS records as JSON-LD for linked data publishing and semantic web interoperability.
+---
+
+## Synopsis
+
+```bash
+dms export FILE [--output FILE]
+dms export --dir DIRECTORY [--output FILE]
+```
+
+## Description
+
+`dms export` converts DMS JSON records to JSON-LD format using the official DMS context (`schema/dms.jsonld`). The output embeds `@context`, maps each record's `type` field to a matching Schema.org `@type`, wraps creators with `foaf:Person`, and wraps locations with `schema:Place`.
+
+- **Single-record export** — wraps one record in a standalone JSON-LD document.
+- **Directory export** — wraps all records in a single `@graph` document. Individual `@context` declarations are stripped from graph members so the shared context at the root applies to the whole collection.
+
+The output files use the `.jsonld` extension by convention.
+
+### Type mapping
+
+| DMS type   | Schema.org `@type`         |
+| ---------- | -------------------------- |
+| `story`    | `schema:Article`           |
+| `photo`    | `schema:Photograph`        |
+| `document` | `schema:DigitalDocument`   |
+| `audio`    | `schema:AudioObject`       |
+| `video`    | `schema:VideoObject`       |
+| `event`    | `schema:Event`             |
+| `map`      | `schema:Map`               |
+| `artwork`  | `schema:VisualArtwork`     |
+| `site`     | `schema:Place`             |
+| `poem`     | `schema:CreativeWork`      |
+
+All records also carry `dms:HeritageRecord` as a second `@type` value.
+
+## Options
+
+<ParamField path="FILE" type="path">
+  Path to a single DMS `.json` file. Can be a single record object or a JSON array. Optional when `--dir` is used.
+</ParamField>
+
+<ParamField path="--dir" type="path">
+  Directory of `.json` files to export as a single `@graph` document. Optional when `FILE` is provided.
+</ParamField>
+
+<ParamField path="--output" type="path" default="derived from input">
+  Output file path.
+  - Single file: defaults to the input path with `.jsonld` extension (e.g., `poem_abc123.jsonld`).
+  - Directory: defaults to `DIRECTORY/collection.jsonld`.
+</ParamField>
+
+## Output structure
+
+<Tabs>
+  <Tab title="Single record">
+```json
+{
+  "@context": { ... },
+  "@type": ["dms:HeritageRecord", "schema:CreativeWork"],
+  "@id": "urn:dms:3f8a1c2b-...",
+  "dc:identifier": "3f8a1c2b-...",
+  "title": "A Poem About Home",
+  "creator": [
+    { "@type": "foaf:Person", "name": "Espérance M." }
+  ],
+  "location": {
+    "@type": "schema:Place",
+    "name": "Dzaleka Refugee Camp"
+  }
+}
+```
+  </Tab>
+  <Tab title="@graph collection">
+```json
+{
+  "@context": { ... },
+  "@graph": [
+    {
+      "@type": ["dms:HeritageRecord", "schema:Article"],
+      "@id": "urn:dms:aaa...",
+      "title": "Story of Arrival"
+    },
+    {
+      "@type": ["dms:HeritageRecord", "schema:Photograph"],
+      "@id": "urn:dms:bbb...",
+      "title": "Market Day"
+    }
+  ]
+}
+```
+  </Tab>
+</Tabs>
+
+## Examples
+
+<CodeGroup>
+
+```bash Export a single record (default output path)
+dms export records/poem_abc123.json
+# writes records/poem_abc123.jsonld
+```
+
+```bash Export a single record to a custom path
+dms export records/poem_abc123.json --output dist/poem.jsonld
+```
+
+```bash Export all records in a directory
+dms export --dir records/
+# writes records/collection.jsonld
+```
+
+```bash Export directory to a custom path
+dms export --dir records/ --output dist/dzaleka-collection.jsonld
+```
+
+</CodeGroup>
+
+## Notes
+
+<Note>
+  The DMS JSON-LD context file must be present at `schema/dms.jsonld` relative to your project root. If it is missing, the export will fail with a `FileNotFoundError`.
+</Note>
+
+<Tip>
+  Use the directory export to produce a single `collection.jsonld` that can be submitted to knowledge graph platforms or published as a Linked Open Data dataset.
+</Tip>

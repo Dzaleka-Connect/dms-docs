@@ -1,0 +1,97 @@
+---
+title: web
+description: Launch the DMS Vault — a local browser-based form for creating, validating, and managing heritage metadata records.
+---
+
+## Synopsis
+
+```bash
+dms web [--port PORT] [--dir DIRECTORY] [--no-open]
+```
+
+## Description
+
+`dms web` starts a lightweight HTTP server (Python's built-in `http.server`) and opens the **DMS Vault** in your default browser. The Vault is a single-page web application that provides a graphical alternative to the terminal wizard for users who prefer a form-based interface.
+
+**DMS Vault features:**
+
+<CardGroup cols={2}>
+  <Card title="Form-based record creation" icon="file-pen">
+    Dropdown menus for type, role, and access level are populated directly from the DMS schema. All required fields are clearly marked.
+  </Card>
+  <Card title="Live validation" icon="circle-check">
+    Each record is validated against the schema as you fill in the form. Errors and warnings appear inline before you save.
+  </Card>
+  <Card title="JSON and JSON-LD copy" icon="copy">
+    Copy the raw DMS JSON or a full JSON-LD representation to the clipboard with one click.
+  </Card>
+  <Card title="Record browser" icon="folder-open">
+    Browse all records saved in the records directory without leaving the browser.
+  </Card>
+</CardGroup>
+
+The server runs entirely locally at `http://127.0.0.1`. No data is sent to any external service. Press **Ctrl+C** in the terminal to stop the server.
+
+## Options
+
+<ParamField path="--port" type="integer" default="8080">
+  Port for the local HTTP server. Change this if port 8080 is already in use.
+</ParamField>
+
+<ParamField path="--dir" type="path" default="records">
+  Directory where saved records are written. The directory is created automatically if it does not exist.
+</ParamField>
+
+<ParamField path="--no-open" type="boolean" default="false">
+  Suppress automatic browser launch. The server still starts; navigate to the URL printed in the terminal manually.
+</ParamField>
+
+## API endpoints
+
+The server exposes a small JSON API used by the Vault frontend:
+
+| Method | Path                | Description |
+| ------ | ------------------- | ----------- |
+| `GET`  | `/`                 | Serves the Vault HTML page. |
+| `GET`  | `/api/schema`       | Returns schema metadata (types, roles, access levels, required fields). |
+| `GET`  | `/api/records`      | Lists all saved records from the records directory. |
+| `GET`  | `/api/new-id`       | Generates a new UUID v4. |
+| `POST` | `/api/validate`     | Validates a record object and returns errors and warnings. |
+| `POST` | `/api/save`         | Validates and saves a record as `TYPE_XXXXXXXX.json` in the records directory. |
+| `POST` | `/api/export-jsonld`| Converts a record object to JSON-LD and returns the result. |
+
+## Examples
+
+<CodeGroup>
+
+```bash Default (port 8080, records/ directory)
+dms web
+```
+
+```bash Custom port
+dms web --port 3000
+```
+
+```bash Custom records directory
+dms web --dir my_records/
+```
+
+```bash Custom port and directory, no auto-open
+dms web --port 9000 --dir archive/ --no-open
+```
+
+</CodeGroup>
+
+## Notes
+
+<Note>
+  The server binds to `127.0.0.1` only. It is not accessible from other machines on your network by design.
+</Note>
+
+<Tip>
+  Use `--no-open` when running `dms web` inside a Docker container or a remote SSH session where a browser cannot be launched automatically.
+</Tip>
+
+<Warning>
+  The `/api/save` endpoint only writes records that pass schema validation. Submitting an invalid record returns HTTP 400 with a list of errors — it will not be saved to disk.
+</Warning>

@@ -1,0 +1,145 @@
+---
+title: 'Rights and access'
+description: 'How to choose the right license and access level for DMS records, and how to credit rights holders correctly.'
+keywords: ['rights', 'access', 'license', 'Creative Commons', 'consent', 'privacy', 'attribution']
+---
+
+Every DMS record must declare how it can be used and who can access it. The `rights` object captures this in three fields: `license`, `access_level`, and `holder`. Getting these right protects community members, respects cultural sensitivity, and ensures the archive is used appropriately.
+
+---
+
+## Access levels
+
+The `access_level` field controls who can view a record. There are three levels.
+
+<CardGroup cols={3}>
+  <Card title="public" icon="globe">
+    Safe for anyone to view. No sensitive personal information, no cultural restrictions. Use this for most records where consent has been obtained.
+  </Card>
+  <Card title="restricted" icon="lock">
+    Contains personal data or sensitive content. Requires explicit permission to access. Use this for records involving identifiable individuals or private matters.
+  </Card>
+  <Card title="community-only" icon="users">
+    Sacred, private, or culturally sensitive material intended only for Dzaleka community members. Use this for items that community members have indicated should not be shared publicly.
+  </Card>
+</CardGroup>
+
+### When to use each level
+
+| Scenario | Access level |
+|----------|--------------|
+| A photograph of a public community event | `public` |
+| An oral history where the narrator consented to open sharing | `public` |
+| A record containing a person's full name, address, or ID number | `restricted` |
+| An interview where the narrator requested limited distribution | `restricted` |
+| A sacred ceremony recording | `community-only` |
+| Culturally sensitive knowledge shared within the community | `community-only` |
+
+<Warning>
+  When you are unsure whether a record is appropriate for public access, default to `restricted` rather than `public`. It is always easier to open access later than to retract material that should not have been shared.
+</Warning>
+
+---
+
+## License selection guide
+
+The `license` field uses SPDX identifiers. The four licenses below cover the vast majority of heritage material in Dzaleka.
+
+| License | Meaning | When to use |
+|---------|---------|-------------|
+| `CC-BY-4.0` | Share and adapt freely; attribution required | Material the rights holder wants to share as openly as possible |
+| `CC-BY-NC-4.0` | Share and adapt; attribution required; no commercial use | Community heritage where commercial exploitation should be prevented |
+| `CC-BY-NC-ND-4.0` | Share only as-is; no modifications; no commercial use | Material the rights holder does not want altered in any form |
+| `CC0-1.0` | No rights reserved; public domain dedication | Material where the rights holder waives all copyright |
+
+<Tip>
+  When in doubt, use **CC-BY-NC-4.0**. It protects the community's rights by preventing commercial exploitation while still allowing researchers, educators, and community members to share and build on the material with attribution.
+</Tip>
+
+---
+
+## The `rights` field
+
+The full `rights` object in JSON looks like this:
+
+```json
+"rights": {
+  "license": "CC-BY-NC-4.0",
+  "access_level": "public",
+  "holder": "Marie Consolée"
+}
+```
+
+All three fields are independent. A record can be `public` (anyone can see it) but under `CC-BY-NC-4.0` (no commercial use). A record can be `restricted` (requires permission) with `CC-BY-4.0` (open license once access is granted).
+
+---
+
+## Credits and attribution
+
+The `holder` field names the rights holder — the person or organisation who owns the copyright. This is usually the creator. For oral histories it is typically the narrator. For photographs it is typically the photographer.
+
+Always list creator(s) in the `creator` array with their accurate roles. This is how the archive attributes work to the people who made it.
+
+```json
+"creator": [
+  {
+    "name": "Marie Consolée",
+    "role": "narrator"
+  },
+  {
+    "name": "Jean-Baptiste Mushimiyimana",
+    "role": "interviewer",
+    "affiliation": "Dzaleka Digital Heritage Project"
+  }
+]
+```
+
+Valid creator roles include: `author`, `photographer`, `interviewer`, `interviewee`, `narrator`, `artist`, `muralist`, `sculptor`, `poet`, `curator`, `recorder`, `editor`, `translator`, `organizer`, `contributor`.
+
+<Warning>
+  Never omit creators or list only an organisation when an individual person did the work. Individual attribution is both an ethical obligation and a condition of the Creative Commons licenses.
+</Warning>
+
+---
+
+## Key considerations
+
+<Warning>
+  **Get consent.** Always obtain consent from people featured in stories, photographs, or recordings before adding a record to the archive. Consent should cover both the use of the material and the access level you intend to set.
+</Warning>
+
+<Warning>
+  **Protect privacy.** Do not include personal identifiers — full addresses, ID numbers, phone numbers, or other identifying details — in records set to `public` access. Move sensitive identifying information out of public fields or set the record to `restricted`.
+</Warning>
+
+<Warning>
+  **Respect cultural sensitivity.** Some heritage items carry cultural or spiritual significance that makes public sharing inappropriate. Consult with community members before assigning a `public` access level to ceremonial, sacred, or otherwise sensitive material.
+</Warning>
+
+---
+
+## Common questions
+
+<AccordionGroup>
+  <Accordion title="What if the rights holder is unknown?">
+    If the original rights holder cannot be identified or contacted, do not assign a permissive license like `CC-BY-4.0` or `CC0-1.0` — those require the rights holder's consent to grant.
+
+    Instead:
+    1. Set `access_level` to `restricted`.
+    2. Leave `license` blank or note `"rights undetermined"` in the `holder` field.
+    3. Record what you know about the item's provenance in the `source` object, including who contributed it and from what collection.
+    4. Review the record again if the rights holder is later identified.
+
+    Restricted access with documented provenance is the correct approach for orphaned works. It keeps the material in the archive without misrepresenting the rights situation.
+  </Accordion>
+  <Accordion title="Can I change the access level later?">
+    Yes. Access levels are stored as metadata and can be updated at any time using `dms edit`. If a narrator who originally requested `restricted` access later consents to `public` access, update the `access_level` field and record the change in the `date.modified` field.
+  </Accordion>
+  <Accordion title="What is the difference between CC-BY-NC-4.0 and CC-BY-NC-ND-4.0?">
+    Both licenses prohibit commercial use. The difference is in modifications:
+    - `CC-BY-NC-4.0` allows others to remix, adapt, and build on the material, as long as they credit the creator and do not use it commercially.
+    - `CC-BY-NC-ND-4.0` adds a no-derivatives condition: others may share the material as-is, but may not modify or adapt it in any way.
+
+    Use `CC-BY-NC-ND-4.0` when the rights holder wants to prevent translations, edits, or remixes of their original work.
+  </Accordion>
+</AccordionGroup>

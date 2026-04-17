@@ -1,0 +1,227 @@
+---
+title: 'Metadata quality'
+description: 'Guidelines for writing DMS records that are discoverable, accurate, and respectful of community heritage.'
+keywords: ['metadata', 'quality', 'titles', 'descriptions', 'tags', 'location']
+---
+
+Good metadata is the foundation of a useful archive. A record that is vague, incomplete, or inconsistently filled in becomes invisible to anyone searching for it — and invisible to future generations who depend on the archive. The guidelines on this page help you write DMS records that are specific, consistent, and discoverable.
+
+## General principles
+
+**Be specific and descriptive.** Avoid generic entries. Metadata exists to help people find and understand heritage items.
+
+| Avoid | Prefer |
+|-------|--------|
+| `Photo` | `Market Day at Dzaleka, May 2024` |
+| `A story` | `Journey to Dzaleka: A Story of Hope` |
+| `Document` | `Community School Registration Records, 2018` |
+| `Some music` | `Traditional Songs of the Great Lakes Region` |
+
+**Write for discovery.** Think about how someone searching the archive would describe this item. Include the terms they would use in the title, description, and subject tags — not just the terms that are obvious to you.
+
+**Be consistent.** Apply the same conventions across all records in a collection: the same tag vocabulary, the same location names, the same date formats. Inconsistency breaks search and browsing.
+
+---
+
+## Writing titles
+
+A title is the first thing anyone sees. Make it count.
+
+- Keep titles **concise but informative** — under 100 characters is ideal
+- Include the **subject and context** when possible
+- Add a **date or location** to distinguish similar items
+- Use the item's **original title** if one exists
+
+<Tip>
+  When two items have the same subject, the date or location is what makes them distinct. "Market Day at Dzaleka, May 2024" is unambiguous; "Market Day" is not.
+</Tip>
+
+### Before and after
+
+<Tabs>
+  <Tab title="Good titles">
+    ```text
+    Journey to Dzaleka: A Story of Hope
+    Market Day at Dzaleka, May 2024
+    Community School Registration Records, 2018
+    Traditional Songs of the Great Lakes Region
+    ```
+  </Tab>
+  <Tab title="Titles to avoid">
+    ```text
+    Photo 001
+    Interview
+    Untitled
+    Document
+    ```
+  </Tab>
+</Tabs>
+
+<Warning>
+  Titles like `Photo 001` or `Untitled` are permanently opaque — they carry no information that helps anyone find the record, and they cannot be improved without going back to the original contributor.
+</Warning>
+
+---
+
+## Writing descriptions
+
+The description field is the most important field for discoverability and context. A good description tells the story behind the item.
+
+Answer these five questions in 2–5 sentences:
+
+<CardGroup cols={2}>
+  <Card title="What" icon="file-text">
+    What kind of item is this? What does it depict, record, or contain?
+  </Card>
+  <Card title="Who" icon="user">
+    Who is involved — as narrator, subject, creator, or community?
+  </Card>
+  <Card title="When" icon="calendar">
+    When did the event occur, or when was the item created?
+  </Card>
+  <Card title="Where" icon="map-pin">
+    Where did it take place? Be as specific as possible within the camp.
+  </Card>
+  <Card title="Why" icon="heart">
+    Why does this item matter? What themes or significance does it carry?
+  </Card>
+</CardGroup>
+
+### Example description
+
+This description from `examples/story.json` demonstrates all five questions:
+
+```text
+An oral history account of a Congolese family's journey from Bukavu to
+Dzaleka Refugee Camp in 2015. The narrator describes the challenges of
+displacement, the experience of crossing borders, and the sense of community
+found upon arrival at Dzaleka. This story captures themes of resilience,
+loss, and rebuilding life in a new place.
+```
+
+- **What:** oral history account
+- **Who:** a Congolese family, the narrator
+- **When:** 2015
+- **Where:** Bukavu to Dzaleka Refugee Camp
+- **Why:** themes of resilience, loss, and rebuilding
+
+<Tip>
+  Write the description so that someone unfamiliar with Dzaleka can understand the significance of the item. Include relevant historical or cultural context.
+</Tip>
+
+---
+
+## Choosing subject tags
+
+Subject tags are keywords that power search and browsing. They are stored in the `subject` array as lowercase strings.
+
+### Rules
+
+<Tabs>
+  <Tab title="Do">
+    - Use **3–10 tags** per record
+    - Include both **broad** terms (`oral history`) and **specific** terms (`Congo`)
+    - Add **cultural** terms where appropriate (`Great Lakes region`)
+    - Use **lowercase** for all tags
+    - Include the **people, places, and themes** central to the item
+  </Tab>
+  <Tab title="Don't">
+    - Repeat the exact wording already in the title
+    - Use vague tags alone (`important`, `good`, `interesting`)
+    - Use unexplained abbreviations
+    - Add more than 10 tags — specificity beats quantity
+  </Tab>
+</Tabs>
+
+### Suggested tag categories
+
+| Category | Examples |
+|----------|---------|
+| Item type | `oral history`, `photograph`, `field recording`, `transcription` |
+| Theme | `displacement`, `resilience`, `education`, `community`, `arrival` |
+| Culture / origin | `Congo`, `Burundi`, `Rwanda`, `Somalia`, `Great Lakes region` |
+| Location | `market`, `school`, `community center`, `Section A` |
+| People | `women`, `youth`, `elders`, `children` |
+| Time | `2024`, `early settlement era`, `2015 displacement` |
+
+### Example from source
+
+The `story.json` example uses seven well-chosen tags that span three categories:
+
+```json
+"subject": [
+  "oral history",
+  "displacement",
+  "Congo",
+  "journey",
+  "resilience",
+  "community",
+  "arrival"
+]
+```
+
+`oral history` is the item type. `Congo` is the cultural origin. `displacement`, `journey`, `resilience`, `community`, and `arrival` are themes — all specific, all meaningful.
+
+---
+
+## Location data
+
+The `location` object anchors an item in physical space. Consistent location names are essential for browsing by area.
+
+### Accepted camp area names
+
+Always use the canonical names below for the `area` field. Do not invent abbreviations or alternative spellings.
+
+| `area` value | Description |
+|-------------|-------------|
+| `Section A` | Residential zone A |
+| `Section B` | Residential zone B |
+| `Section C` | Residential zone C |
+| `Market Area` | The main trading and market area |
+| `Community Center` | The central community gathering space |
+| `Main Ground` | The main open ground |
+| `School Area` | The primary and secondary school area |
+| `Health Center` | The camp health facility area |
+
+### Coordinates
+
+Dzaleka Refugee Camp approximate coordinates:
+
+| | Value |
+|--|-------|
+| Latitude | `-13.7833` |
+| Longitude | `33.9833` |
+
+When you know the precise location of the item within the camp, provide specific coordinates. When you do not, use the camp-level coordinates above and rely on the `area` field for specificity.
+
+### Example location object
+
+```json
+"location": {
+  "name": "Dzaleka Refugee Camp",
+  "area": "Community Center",
+  "latitude": -13.7833,
+  "longitude": 33.9833
+}
+```
+
+<Warning>
+  Never leave `area` as a free-form note like `"near the market"` or `"block 3"`. Use only the canonical names above so that records can be grouped and filtered reliably.
+</Warning>
+
+---
+
+## Quality checklist
+
+Before submitting a record, verify every item below. You can also run `dms validate your-record.json` to check schema compliance.
+
+- [ ] Title is specific and descriptive — no generic labels like "Photo" or "Untitled"
+- [ ] `type` is correctly chosen from the allowed values
+- [ ] Description answers What, Who, When, Where, and Why (2+ sentences)
+- [ ] `language` code is correct (e.g., `en`, `sw`, `fr`, `rw`)
+- [ ] Creator(s) are listed with accurate roles
+- [ ] At least 3 subject tags are included, all lowercase
+- [ ] `location.name` is set; `location.area` uses a canonical camp area name
+- [ ] `rights.license` and `rights.access_level` are set appropriately
+- [ ] Consent has been obtained from all people featured in the record
+- [ ] Record passes schema validation: `dms validate your-record.json`

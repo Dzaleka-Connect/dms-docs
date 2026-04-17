@@ -1,0 +1,201 @@
+---
+title: 'Oral histories'
+description: 'How to document oral history records in DMS — from recording consent to preserving interview context.'
+keywords: ['oral history', 'narrator', 'interviewer', 'consent', 'language', 'transcription', 'audio']
+---
+
+Oral histories are among the most significant and most sensitive items in the Dzaleka archive. They carry the voices of community members directly — their words, their experiences, their memory of events. That directness demands more care than most other record types.
+
+This page covers the specific practices that apply to oral history records, whether the item is an audio recording or a transcription.
+
+---
+
+## Why oral histories require special care
+
+Unlike a photograph or a document, an oral history record contains a living person's account of personal experience. The narrator has given something of themselves. Several things follow from that:
+
+- The narrator's **consent** must be obtained before the record is archived, and the scope of that consent must be respected in the access level you set.
+- The narrator is a **creator**, not a subject. Their name and role must appear in the `creator` array.
+- The **language** the narrator spoke in must be recorded — it is part of the record's authenticity.
+- The **context** of the interview — who was present, when it happened, what the narrator chose to share — belongs in the description.
+
+---
+
+## Oral history documentation workflow
+
+<Steps>
+  <Step title="Obtain and record consent">
+    Before the interview, discuss with the narrator how the recording will be used, who will have access to it, and under what conditions. Agree on an access level (`public`, `restricted`, or `community-only`) and document the consent.
+
+    <Warning>
+      Do not create a DMS record for an oral history until consent has been obtained. If the narrator's wishes are unclear, default to `restricted` access until clarified.
+    </Warning>
+  </Step>
+  <Step title="Conduct the interview and note the context">
+    Record who conducted the interview, where it took place, and the date. Note whether it was conducted in the narrator's first language or a second language. These details go into the description and the `creator` array.
+  </Step>
+  <Step title="Initialize the record">
+    Run `dms init` to create a new record with a UUID. Set `type` to `story` for oral history narratives, or `audio` if the primary item is the recording itself.
+
+    ```bash
+    dms init --type story
+    ```
+  </Step>
+  <Step title="List both participants as creators">
+    The narrator and the interviewer are both creators. List them with accurate roles:
+
+    ```json
+    "creator": [
+      {
+        "name": "Marie Consolée",
+        "role": "narrator"
+      },
+      {
+        "name": "Jean-Baptiste Mushimiyimana",
+        "role": "interviewer",
+        "affiliation": "Dzaleka Digital Heritage Project"
+      }
+    ]
+    ```
+  </Step>
+  <Step title="Set the language field">
+    Set `language` to the language spoken in the interview — not the language of any translation or transcription. Use IETF BCP 47 codes.
+
+    | Code | Language |
+    |------|----------|
+    | `en` | English |
+    | `sw` | Swahili |
+    | `fr` | French |
+    | `rw` | Kinyarwanda |
+    | `ki` | Kirundi |
+    | `ln` | Lingala |
+    | `so` | Somali |
+    | `ny` | Chichewa |
+
+    If the interview was conducted in two languages, record the primary language.
+  </Step>
+  <Step title="Set the format field">
+    The `format` field specifies the MIME type of the digital object being described.
+
+    | Item | `format` value |
+    |------|----------------|
+    | Transcription (plain text) | `text/plain` |
+    | Transcription (PDF) | `application/pdf` |
+    | Audio recording (MP3) | `audio/mpeg` |
+    | Audio recording (WAV) | `audio/wav` |
+    | Audio recording (OGG) | `audio/ogg` |
+
+    If both a transcription and an audio recording exist as separate items, create two records and link them using the `relation` field.
+  </Step>
+  <Step title="Write a contextual description">
+    The description should preserve the interview context. Include:
+
+    - What the narrator chose to share
+    - The circumstances or occasion of the interview
+    - Themes the account addresses
+    - The original event date and location, if known
+
+    Aim for 2–5 sentences. See the example below for a model description.
+  </Step>
+  <Step title="Set access level as agreed with the narrator">
+    Use the access level the narrator consented to. Do not upgrade access later without re-obtaining consent.
+
+    ```json
+    "rights": {
+      "license": "CC-BY-NC-4.0",
+      "access_level": "public",
+      "holder": "Marie Consolée"
+    }
+    ```
+  </Step>
+  <Step title="Validate the record">
+    Run schema validation before submitting:
+
+    ```bash
+    dms validate your-record.json
+    ```
+  </Step>
+</Steps>
+
+---
+
+## Example: a well-documented oral history record
+
+The following is the complete `story.json` example from the DMS repository. It demonstrates every field described above.
+
+```json
+{
+  "id": "b3e7c8a1-4d5f-6e7a-8b9c-0d1e2f3a4b5c",
+  "title": "Journey to Dzaleka: A Story of Hope",
+  "type": "story",
+  "description": "An oral history account of a Congolese family's journey from Bukavu to Dzaleka Refugee Camp in 2015. The narrator describes the challenges of displacement, the experience of crossing borders, and the sense of community found upon arrival at Dzaleka. This story captures themes of resilience, loss, and rebuilding life in a new place.",
+  "language": "en",
+  "creator": [
+    {
+      "name": "Marie Consolée",
+      "role": "narrator"
+    },
+    {
+      "name": "Jean-Baptiste Mushimiyimana",
+      "role": "interviewer",
+      "affiliation": "Dzaleka Digital Heritage Project"
+    }
+  ],
+  "date": {
+    "created": "2024-03-15",
+    "event_date": "2015-08-22"
+  },
+  "subject": [
+    "oral history",
+    "displacement",
+    "Congo",
+    "journey",
+    "resilience",
+    "community",
+    "arrival"
+  ],
+  "location": {
+    "name": "Dzaleka Refugee Camp",
+    "area": "Community Center",
+    "latitude": -13.7833,
+    "longitude": 33.9833
+  },
+  "format": "text/plain",
+  "rights": {
+    "license": "CC-BY-NC-4.0",
+    "access_level": "public",
+    "holder": "Marie Consolée"
+  },
+  "source": {
+    "contributor": "Dzaleka Digital Heritage Project",
+    "collection": "Oral Histories 2024",
+    "original_format": "audio interview (transcribed)"
+  },
+  "coverage": {
+    "start_date": "2015-01-01",
+    "end_date": "2015-12-31",
+    "period": "2015 displacement and arrival"
+  },
+  "schema_version": "1.0.0"
+}
+```
+
+### What this record does well
+
+<AccordionGroup>
+  <Accordion title="Both participants are credited as creators">
+    Marie Consolée is listed with `role: narrator` — not as a subject, not as a contributor, but as a creator. Jean-Baptiste Mushimiyimana is listed as `interviewer` with his institutional affiliation. The `rights.holder` is set to the narrator, because the account is hers.
+  </Accordion>
+  <Accordion title="The description preserves interview context">
+    The description names the narrator's origin (Bukavu), the destination (Dzaleka), the year (2015), and the themes (resilience, loss, rebuilding). Someone encountering this record with no prior knowledge of Dzaleka can understand what it contains and why it matters.
+  </Accordion>
+  <Accordion title="event_date vs. created are distinct">
+    `date.created` (`2024-03-15`) is when the metadata record was written. `date.event_date` (`2015-08-22`) is when the original journey took place. These are separate fields for a reason — the archive date and the historical date must not be conflated.
+  </Accordion>
+  <Accordion title="source documents provenance">
+    The `source` object records that this was originally an audio interview that was later transcribed, contributed by the Dzaleka Digital Heritage Project, and filed in the `Oral Histories 2024` collection. This provenance chain is essential for future researchers.
+  </Accordion>
+  <Accordion title="coverage captures the historical period">
+    The `coverage` object gives the temporal scope of the content itself — the year 2015 — separate from the date the record was created. The human-readable `period` field (`2015 displacement and arrival`) aids browsing and search.
+  </Accordion>
+</AccordionGroup>

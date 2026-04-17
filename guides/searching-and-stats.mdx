@@ -1,0 +1,131 @@
+---
+title: "Searching and Analytics"
+description: "Search records by type, subject, creator, date, and free text. Generate collection statistics and browsable catalogues."
+keywords: ["dms", "search", "filter", "stats", "report", "diff", "analytics", "catalogue"]
+---
+
+As your archive grows, DMS provides tools to query and analyse the collection without leaving the terminal. `dms search` filters records across multiple dimensions, `dms stats` shows collection-level analytics, `dms report` generates a browsable catalogue, and `dms diff` compares two records field by field.
+
+## Searching records
+
+All filters are combined with AND logic — every filter you add narrows the result set further.
+
+```bash
+dms search --dir records/ [FILTERS]
+```
+
+### Available filters
+
+| Flag | Description |
+|---|---|
+| `-t`, `--type` | Exact match on heritage type (`story`, `photo`, `poem`, …) |
+| `-s`, `--subject` | Partial match on any subject tag |
+| `-c`, `--creator` | Partial match on any creator name |
+| `-l`, `--language` | Exact match on language code (`en`, `sw`, `rw`, `fr`, …) |
+| `--from DATE` | Records with `date.created` on or after `YYYY-MM-DD` |
+| `--to DATE` | Records with `date.created` on or before `YYYY-MM-DD` |
+| `-q`, `--query` | Free-text search across `title`, `description`, and `subject` |
+| `--verbose` | Include a description excerpt for each result |
+
+### Search examples
+
+<CodeGroup>
+
+```bash Filter by type
+dms search --dir records/ --type poem
+```
+
+```bash Filter by subject and language
+dms search --dir records/ --subject "displacement" --language en
+```
+
+```bash Filter by creator name (partial match)
+dms search --dir records/ --creator "Espérance" --verbose
+```
+
+```bash Free-text query with date range
+dms search --dir records/ -q "refugee" --from 2024-01-01
+```
+
+```bash Combine type and subject
+dms search --dir records/ --type poem --subject "resilience"
+```
+
+```bash Audio in Kinyarwanda from 2024
+dms search --dir records/ --type audio --language rw --from 2024-01-01 --to 2024-12-31
+```
+
+</CodeGroup>
+
+### Reading results
+
+Matching records are shown in a rounded table with columns for filename, title, type, language, and creator. With `--verbose`, a truncated description (120 characters) is printed beneath the table for each match.
+
+```
+╭─ Search Results (2 found) ──────────────────────────────────────────────╮
+│ File                   Title                  Type   Lang  Creator      │
+│ story_b3e7c8a1.json    Journey to Dzaleka…    story  en    Marie Cons…  │
+│ audio_d7e8f9a0.json    Traditional Songs…     audio  rw    Espérance N… │
+╰─────────────────────────────────────────────────────────────────────────╯
+```
+
+If no records match, the command prints `No records matched your search.` and exits with code `0`.
+
+## Collection statistics
+
+```bash
+dms stats --dir records/
+```
+
+`dms stats` analyses every `.json` file in the directory and displays:
+
+- **Type distribution** — count of records per heritage type
+- **Language breakdown** — count of records per language code
+- **Completion heatmap** — which recommended fields (`creator`, `date`, `subject`, `location`, `rights`) are filled in across the collection, making it easy to spot gaps
+
+This is useful for understanding the shape of your archive and prioritising metadata improvement work.
+
+## Generating a catalogue
+
+`dms report` reads all records in a directory and produces a browsable catalogue you can open locally or host for the community.
+
+```bash
+# Default: HTML report saved to records/report.html
+dms report --dir records/
+
+# Save to a specific path
+dms report --dir records/ --output my_catalogue.html
+
+# Markdown format
+dms report --dir records/ --format md
+
+# Markdown with custom title
+dms report --dir records/ --format md --output catalogue.md --title "Oral Histories 2024"
+```
+
+| Option | Default | Description |
+|---|---|---|
+| `--dir` | *(required)* | Directory of DMS records to include |
+| `--output` | `<dir>/report.html` or `<dir>/report.md` | Output file path |
+| `--format` | `html` | Output format: `html` or `md` |
+| `--title` | `Dzaleka Heritage Collection` | Heading shown at the top of the catalogue |
+
+## Comparing two records
+
+`dms diff` performs a field-level comparison between two records and highlights what has changed:
+
+```bash
+dms diff records/story_v1.json records/story_v2.json
+```
+
+By default, only changed and missing fields are shown. Pass `--all` to include unchanged fields as well:
+
+```bash
+dms diff examples/poem.json examples/story.json --all
+```
+
+This is useful for reviewing edits, comparing drafts, or auditing how a record has changed over time.
+
+<Note>
+  `dms diff` compares field values semantically — it will flag a field that changed from `"public"` to `"restricted"` without requiring you to do a line-by-line text diff of the raw JSON.
+</Note>

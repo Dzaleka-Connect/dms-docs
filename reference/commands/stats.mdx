@@ -1,0 +1,99 @@
+---
+title: stats
+description: Print collection statistics for a directory of DMS records including type distribution, language breakdown, and a missing-field heatmap.
+---
+
+## Synopsis
+
+```bash
+dms stats --dir DIRECTORY
+```
+
+## Description
+
+`dms stats` scans every `.json` file in a directory and prints a set of summary tables to the terminal. It is useful for quickly understanding the composition of a collection and spotting records that are missing recommended metadata.
+
+**Output sections:**
+
+<CardGroup cols={2}>
+  <Card title="Collection summary" icon="chart-bar">
+    Total records, valid count (has all five required fields), and invalid count.
+  </Card>
+  <Card title="Records by type" icon="tag">
+    Count per heritage type with an inline bar chart.
+  </Card>
+  <Card title="Records by language" icon="globe">
+    Count per language code, sorted by frequency.
+  </Card>
+  <Card title="Records by access level" icon="lock">
+    Breakdown of `rights.access_level` values across the collection.
+  </Card>
+  <Card title="Top 15 subjects" icon="list">
+    Most frequent subject tags across all records.
+  </Card>
+  <Card title="Top 10 contributors" icon="users">
+    Creator names ranked by number of records they appear in.
+  </Card>
+  <Card title="Missing fields heatmap" icon="triangle-alert">
+    For each recommended field (`creator`, `date`, `subject`, `location`, `rights`), shows how many records are missing it as a count, percentage, and inline bar.
+  </Card>
+</CardGroup>
+
+## Options
+
+<ParamField path="--dir" type="path" required>
+  Directory of DMS records to analyse. Must exist and be a directory.
+</ParamField>
+
+## Example output
+
+```text
+╔══════════════════════════════════╗
+║ Collection Statistics            ║
+║                                  ║
+║   Total records:   24            ║
+║   Valid:           22            ║
+║   Invalid:         2             ║
+╚══════════════════════════════════╝
+
+ Records by Type
+ ┌──────────────┬────────┬───────────────────────┐
+ │ Type         │  Count │ Bar                   │
+ ├──────────────┼────────┼───────────────────────┤
+ │ story        │     10 │ ████████████████████  │
+ │ poem         │      7 │ ██████████████        │
+ │ photo        │      5 │ ██████████            │
+ │ audio        │      2 │ ████                  │
+ └──────────────┴────────┴───────────────────────┘
+
+ Missing Recommended Fields:
+      creator  4/24 (17%)  ░░░
+         date  2/24  (8%)  ░
+      subject  6/24 (25%)  ░░░░░
+     location  9/24 (38%)  ░░░░░░░
+       rights  3/24 (13%)  ░░
+```
+
+## Examples
+
+<CodeGroup>
+
+```bash Basic usage
+dms stats --dir records/
+```
+
+```bash Stats on the examples directory
+dms stats --dir examples/
+```
+
+</CodeGroup>
+
+## Notes
+
+<Note>
+  Validity in `dms stats` is determined by a quick check for the five required fields (`id`, `title`, `type`, `description`, `language`). For full schema validation including type constraints and enum values, use `dms validate --dir`.
+</Note>
+
+<Tip>
+  Use the missing-field heatmap to prioritise enrichment work. Fields that are absent from a large percentage of records are the best candidates for a batch update.
+</Tip>

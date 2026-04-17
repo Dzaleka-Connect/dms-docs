@@ -1,0 +1,175 @@
+---
+title: Installation
+description: Prerequisites, installation steps, and troubleshooting for the Dzaleka Metadata Standard CLI toolkit.
+---
+
+DMS is a Python package installed from source. The setup takes about two minutes.
+
+## Prerequisites
+
+Before installing, confirm you have the following:
+
+| Requirement | Minimum version | Check command |
+|-------------|-----------------|---------------|
+| Python | 3.9 | `python3 --version` |
+| pip | Included with Python 3.9+ | `pip --version` |
+| Git | Any recent version | `git --version` |
+
+DMS is tested against Python 3.9, 3.10, 3.11, 3.12, and 3.13.
+
+## Install DMS
+
+<Steps>
+  <Step title="Clone the repository">
+    ```bash
+    git clone https://github.com/Dzaleka-Connect/Dzaleka-Metadata-Standard.git
+    cd dzaleka-metadata-standard
+    ```
+  </Step>
+
+  <Step title="Install the package">
+    Install in editable (development) mode so that the schema files bundled inside the repository resolve correctly at runtime:
+
+    ```bash
+    pip install -e .
+    ```
+
+    This installs the `dms` entry point and the following dependencies declared in `pyproject.toml`:
+
+    - `click>=8.0` — CLI framework
+    - `jsonschema>=4.0` — Schema validation engine
+    - `pyyaml>=6.0` — YAML schema support
+    - `rich>=13.0` — Terminal output formatting
+
+    <Tip>
+      To install without editable mode, run `pip install .` instead. Editable mode is recommended if you plan to modify the schema or CLI source.
+    </Tip>
+  </Step>
+
+  <Step title="Verify the installation">
+    Run these two commands to confirm everything is working:
+
+    ```bash
+    dms --version
+    dms info
+    ```
+
+    Expected output for `dms --version`:
+
+    ```
+    dms, version 1.0.0
+    ```
+
+    Expected output for `dms info` (truncated):
+
+    ```
+    ╔══════════════════════════════════════════════════════════╗
+    ║  Dzaleka Metadata Standard (DMS)                        ║
+    ║  An open-source metadata standard for documenting       ║
+    ║  and sharing Dzaleka's digital heritage.                ║
+    ║                                                          ║
+    ║    CLI version:    1.0.0                                 ║
+    ║    Schema version: 1.0.0                                 ║
+    ╚══════════════════════════════════════════════════════════╝
+
+    Schema Fields
+    ╭──────────────────┬──────────┬─────────────────────────────────────╮
+    │ Field            │ Required │ Description                         │
+    ├──────────────────┼──────────┼─────────────────────────────────────┤
+    │ id               │ ✓ Yes    │ Unique identifier (UUID)            │
+    │ title            │ ✓ Yes    │ Name of the heritage item           │
+    │ type             │ ✓ Yes    │ Heritage category                   │
+    │ description      │ ✓ Yes    │ Narrative context                   │
+    │ language         │ ✓ Yes    │ BCP 47 language code                │
+    │ ...              │          │                                     │
+    ╰──────────────────┴──────────┴─────────────────────────────────────╯
+
+    Heritage Types: story, photo, document, audio, video, event, map, artwork, site, poem
+    ```
+
+    If both commands succeed, DMS is installed correctly.
+  </Step>
+</Steps>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="dms: command not found">
+    This means the Python scripts directory is not in your `PATH`.
+
+    First, confirm the package installed without errors:
+
+    ```bash
+    pip show dzaleka-metadata-standard
+    ```
+
+    Then find where pip places scripts on your system:
+
+    ```bash
+    python3 -m site --user-base
+    ```
+
+    This prints a base path such as `/home/yourname/.local`. The `dms` executable lives in the `bin/` subdirectory of that path (e.g., `/home/yourname/.local/bin`). Add that directory to your `PATH`:
+
+    ```bash
+    # Add to ~/.bashrc or ~/.zshrc
+    export PATH="$HOME/.local/bin:$PATH"
+    ```
+
+    Then reload your shell:
+
+    ```bash
+    source ~/.bashrc
+    ```
+
+    On some systems (particularly macOS with Homebrew Python), the scripts directory may be under a versioned path. Use `pip install -e .` from within a virtual environment to avoid PATH complications entirely:
+
+    ```bash
+    python3 -m venv .venv
+    source .venv/bin/activate
+    pip install -e .
+    dms --version
+    ```
+  </Accordion>
+
+  <Accordion title="FileNotFoundError: DMS schema not found">
+    DMS locates its bundled schema files relative to the installed package directory. This error occurs when the package is installed in a way that breaks that relative path.
+
+    The most reliable fix is to install in editable mode from inside the cloned repository:
+
+    ```bash
+    cd dzaleka-metadata-standard
+    pip install -e .
+    ```
+
+    If you have already done this and still see the error, confirm that the `schema/` directory exists inside the repository root:
+
+    ```bash
+    ls schema/
+    # Expected: dms.json  dms.jsonld  dms.yaml
+    ```
+
+    If the directory is missing, re-clone the repository — a shallow clone or partial download may have omitted it.
+
+    <Note>
+      Always run `dms` commands from within the cloned repository directory, or from a path where the installed package can resolve `../schema/*.json` correctly.
+    </Note>
+  </Accordion>
+
+  <Accordion title="jsonschema validation errors you don't understand">
+    Run `dms info` to see the full list of valid field values, heritage types, creator roles, and access levels:
+
+    ```bash
+    dms info
+    ```
+
+    Common causes of validation errors:
+
+    - **Invalid `type` value** — The `type` field must be one of the ten allowed values: `story`, `photo`, `document`, `audio`, `video`, `event`, `map`, `artwork`, `site`, `poem`. Any other string will fail validation.
+    - **Empty required fields** — The fields `id`, `title`, `type`, `description`, and `language` are required and cannot be empty strings or `null`.
+    - **Malformed UUID** — The `id` field must be a valid UUID v4 string (e.g., `b3e7c8a1-4d5f-6e7a-8b9c-0d1e2f3a4b5c`). You can generate one with `python3 -c "import uuid; print(uuid.uuid4())"`.
+    - **Wrong language format** — The `language` field must be a BCP 47 language tag (e.g., `en`, `sw`, `fr`, `rw`), not a full language name.
+
+    For detailed definitions of every field and its constraints, see the [field guide](/reference/field-guide).
+  </Accordion>
+</AccordionGroup>

@@ -1,0 +1,102 @@
+---
+title: search
+description: Query and filter DMS records in a directory by type, subject, creator, language, date range, or free text.
+---
+
+## Synopsis
+
+```bash
+dms search --dir DIRECTORY [FILTERS]
+```
+
+## Description
+
+`dms search` scans every `.json` file in a directory, loads the records, and applies the filters you specify. All filter conditions are combined with **AND** logic — a record must satisfy every active filter to appear in the results.
+
+Results are printed as a formatted table showing filename, title, type, language, and creator. Add `--verbose` to also print a truncated description below the table.
+
+## Options
+
+<ParamField path="--dir" type="path" required>
+  Directory of DMS records to search. Must exist and must be a directory.
+</ParamField>
+
+<ParamField path="--type" type="string" default="None">
+  Filter by heritage type. Must be an exact match (e.g., `poem`, `story`, `photo`).
+</ParamField>
+
+<ParamField path="--subject" type="string" default="None">
+  Filter by subject tag. Partial, case-insensitive match against each value in the `subject` array (e.g., `--subject displacement` matches `forced displacement`).
+</ParamField>
+
+<ParamField path="--creator" type="string" default="None">
+  Filter by creator name. Partial, case-insensitive match against the `name` field of each creator object.
+</ParamField>
+
+<ParamField path="--language" type="string" default="None">
+  Filter by language code. Exact match (e.g., `en`, `sw`, `fr`).
+</ParamField>
+
+<ParamField path="--from" type="string" default="None">
+  Include only records whose `date.created` is on or after this date. Format: `YYYY-MM-DD`.
+</ParamField>
+
+<ParamField path="--to" type="string" default="None">
+  Include only records whose `date.created` is on or before this date. Format: `YYYY-MM-DD`.
+</ParamField>
+
+<ParamField path="--query" type="string" default="None">
+  Free-text search. Case-insensitive substring match across `title`, `description`, and `subject` values.
+</ParamField>
+
+<ParamField path="--verbose" type="boolean" default="false">
+  Show a truncated description (up to 120 characters) for each matching record below the results table.
+</ParamField>
+
+## Examples
+
+<CodeGroup>
+
+```bash Filter by type
+dms search --dir records/ --type poem
+```
+
+```bash Filter by subject
+dms search --dir records/ --subject displacement
+```
+
+```bash Filter by creator (partial name)
+dms search --dir records/ --creator "Espérance"
+```
+
+```bash Filter by language
+dms search --dir records/ --language sw
+```
+
+```bash Date range
+dms search --dir records/ --from 2024-01-01 --to 2024-12-31
+```
+
+```bash Free-text query
+dms search --dir records/ --query "refugee camp"
+```
+
+```bash Combined filters with verbose output
+dms search --dir records/ --type story --language en --from 2023-06-01 --verbose
+```
+
+</CodeGroup>
+
+## Notes
+
+<Note>
+  Records with no `date.created` field are excluded when `--from` or `--to` is used, because there is no date to compare against.
+</Note>
+
+<Tip>
+  Combine `--query` with `--type` to quickly narrow results: `dms search --dir records/ --type poem --query "memory"`.
+</Tip>
+
+<Note>
+  JSON files containing a top-level array are also searched — each element of the array is treated as a separate record, identified by `filename[index]` in the results table.
+</Note>

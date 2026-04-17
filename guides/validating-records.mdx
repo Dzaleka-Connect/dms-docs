@@ -1,0 +1,136 @@
+---
+title: "Validating Records"
+description: "Check DMS records against the schema to catch errors before adding them to your archive."
+keywords: ["dms", "validate", "schema", "errors", "warnings", "ci", "batch"]
+---
+
+The `dms validate` command checks one or more records against the DMS JSON Schema. It distinguishes between **errors** that must be fixed and **warnings** for recommended fields that are absent.
+
+## Validating a single file
+
+```bash
+dms validate my-record.json
+```
+
+If the record is valid you will see a green panel, followed by any warnings for recommended fields that are missing:
+
+```
+╭────────────────────────────────────╮
+│ ✓ VALID  examples/story.json       │
+╰────────────────────────────────────╯
+  ⚠ Recommended field 'Format' is not provided.
+```
+
+If the record has schema violations you will see a red panel and a table listing every problem:
+
+```
+╭────────────────────────────────────╮
+│ ✗ INVALID  bad-record.json         │
+╰────────────────────────────────────╯
+ Field            Issue
+ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ Title            Value cannot be empty.
+ Type             Invalid value 'unknown'. Allowed: story, ...
+```
+
+## Validating an entire directory
+
+Pass `--dir` to validate every `.json` file in a directory at once:
+
+```bash
+dms validate --dir records/
+```
+
+Each file is reported individually, then a batch summary is printed:
+
+```
+╭──────────────────────────────────╮
+│ Batch Validation Summary         │
+│                                  │
+│   Total files:  12               │
+│   Valid:        11               │
+│   Invalid:      1                │
+╰──────────────────────────────────╯
+```
+
+## Errors vs. warnings
+
+<AccordionGroup>
+  <Accordion title="Errors — must fix">
+    Errors mean the record does not conform to the DMS schema. The record will be rejected by any tool that enforces the schema. Common causes:
+
+    | Error message | What to do |
+    |---|---|
+    | `Required field 'Title' is missing.` | Add the `title` key with a non-empty string value. |
+    | `Required field 'ID' is missing.` | Add the `id` key containing a valid UUID. |
+    | `Value cannot be empty.` | The field is present but set to `""` — provide a real value. |
+    | `Invalid value 'unknown'. Allowed: story, photo, …` | The `type` value is not in the permitted enum list. Run `dms info` to see all valid types. |
+    | `Expected type 'array', got 'str'.` | A field that expects an array (such as `subject`) was given a plain string. Wrap the value in `[]`. |
+    | `Value '2024-99-01' is not a valid date.` | Dates must be ISO 8601 (`YYYY-MM-DD`). |
+    | `Value 'urn:...' does not match expected format.` | The `id` field must be a UUID (`xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`). |
+  </Accordion>
+
+  <Accordion title="Warnings — recommended">
+    Warnings indicate that a recommended field is absent. The record is still technically valid, but completing these fields improves discoverability and data quality. The recommended fields checked are:
+
+    `creator`, `date`, `subject`, `location`, `rights`, `source`, `format`
+
+    You can safely publish a record with warnings, but consider filling these fields before contributing to a shared archive.
+  </Accordion>
+</AccordionGroup>
+
+## Validation workflow
+
+<Steps>
+  <Step title="Create or edit your record">
+    Use `dms init`, the DMS Vault, or a text editor to produce a `.json` file. See [Creating records](/guides/creating-records) for details.
+  </Step>
+
+  <Step title="Run single-file validation">
+    ```bash
+    dms validate my-record.json
+    ```
+
+    Read every error in the output table — each row names the field and describes the problem precisely.
+  </Step>
+
+  <Step title="Fix errors">
+    Address each error. The most common fixes:
+
+    - Add missing required fields (`id`, `title`, `type`, `description`, `language`)
+    - Replace empty string values with real content
+    - Correct the `type` value to one of the permitted enum values
+    - Wrap multi-value fields (`subject`) in a JSON array
+
+    Run `dms info` at any time to see all valid `type` values, creator roles, and access levels.
+  </Step>
+
+  <Step title="Re-validate until clean">
+    Re-run `dms validate` after each round of fixes. Repeat until you see the green `✓ VALID` panel.
+  </Step>
+
+  <Step title="Batch-validate your archive directory">
+    Before publishing or sharing your collection, run a batch validation:
+
+    ```bash
+    dms validate --dir records/
+    ```
+
+    The command exits with code `1` if any file is invalid, making it suitable for CI/CD pipelines.
+  </Step>
+</Steps>
+
+## Using validation in CI/CD
+
+Because `dms validate` exits with code `0` when all records are valid and `1` when any are invalid, you can integrate it directly into a CI pipeline:
+
+```yaml .github/workflows/validate.yml
+- name: Validate DMS records
+  run: dms validate --dir records/
+```
+
+The pipeline step will fail automatically if a contributor adds an invalid record, preventing malformed metadata from reaching your main branch.
+
+<Tip>
+  Add `dms validate --dir records/` as a pre-commit hook to catch errors before they are ever committed.
+</Tip>

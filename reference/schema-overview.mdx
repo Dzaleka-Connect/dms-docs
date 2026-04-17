@@ -1,0 +1,149 @@
+---
+title: "Schema Overview"
+description: "A high-level reference for the Dzaleka Metadata Standard schema — version, formats, field tiers, and example records."
+keywords: ["DMS", "schema", "metadata", "heritage", "Dublin Core", "JSON Schema"]
+---
+
+The Dzaleka Metadata Standard (DMS) schema describes a single heritage item from Dzaleka Refugee Camp. It is based on **Dublin Core** with community-specific extensions and is available in three machine-readable formats.
+
+## Schema details
+
+| Property | Value |
+|---|---|
+| Version | `1.0.0` |
+| Base specification | JSON Schema Draft 2020-12 |
+| Dublin Core alignment | Full — all 15 fields map to `dc:` or `dcterms:` |
+| Additional properties | Not allowed (`additionalProperties: false`) |
+
+## Available formats
+
+<CardGroup cols={3}>
+  <Card title="JSON Schema" icon="brackets-curly" href="https://github.com/Dzaleka-Connect/Dzaleka-Metadata-Standard/blob/main/schema/dms.json">
+    `schema/dms.json` — Draft 2020-12. Use for programmatic validation in any language or CI pipeline.
+  </Card>
+  <Card title="YAML Schema" icon="file-code" href="https://github.com/Dzaleka-Connect/Dzaleka-Metadata-Standard/blob/main/schema/dms.yaml">
+    `schema/dms.yaml` — Identical to `dms.json`, useful for human-readable review and YAML-based tooling.
+  </Card>
+  <Card title="JSON-LD Context" icon="diagram-project" href="https://github.com/Dzaleka-Connect/Dzaleka-Metadata-Standard/blob/main/schema/dms.jsonld">
+    `schema/dms.jsonld` — RDF/Linked Data context. Enables semantic web publishing with vocabulary mappings to Dublin Core, FOAF, BIBO, Schema.org, and W3C Geo.
+  </Card>
+</CardGroup>
+
+## Field tiers
+
+The schema defines **15 fields** across three tiers. The `required` array in `dms.json` enforces the five fields every valid record must include.
+
+| Field | Tier | Type | Dublin Core mapping |
+|---|---|---|---|
+| `id` | Required | string (UUID v4) | `dc:identifier` |
+| `title` | Required | string (1–500 chars) | `dc:title` |
+| `type` | Required | enum (10 values) | `dc:type` |
+| `description` | Required | string | `dc:description` |
+| `language` | Required | string (BCP 47) | `dc:language` |
+| `creator` | Recommended | array of Creator objects | `dc:creator` |
+| `date` | Recommended | DateInfo object | `dc:date` / `dcterms:created` / `dcterms:modified` |
+| `subject` | Recommended | array of strings | `dc:subject` |
+| `location` | Recommended | Location object | `dcterms:spatial` |
+| `rights` | Recommended | Rights object | `dc:rights` |
+| `source` | Optional | Source object | `dc:source` |
+| `format` | Optional | string (MIME type) | `dc:format` |
+| `relation` | Optional | array of UUIDs | `dc:relation` |
+| `coverage` | Optional | Coverage object | `dc:coverage` |
+| `schema_version` | Optional | const `"1.0.0"` | `schema:schemaVersion` |
+
+<Note>
+  Recommended fields are not enforced by the JSON Schema validator, but including them significantly improves discoverability, interoperability, and archival completeness. The `dms stats` command reports field completion rates across a collection.
+</Note>
+
+## Minimal valid record
+
+A record that passes schema validation must include only the five required fields.
+
+```json minimal-record.json
+{
+  "id": "b3e7c8a1-4d5f-6e7a-8b9c-0d1e2f3a4b5c",
+  "title": "Journey to Dzaleka: A Story of Hope",
+  "type": "story",
+  "description": "An oral history account of a Congolese family's journey from Bukavu to Dzaleka Refugee Camp in 2015.",
+  "language": "en"
+}
+```
+
+<Warning>
+  A minimal record passes validation but lacks rights information, creator attribution, and location context. Use it only as a starting point — complete the recommended fields before publishing.
+</Warning>
+
+## Fully populated record
+
+The example below is taken directly from `examples/story.json`. It demonstrates all available field groups.
+
+```json examples/story.json
+{
+  "id": "b3e7c8a1-4d5f-6e7a-8b9c-0d1e2f3a4b5c",
+  "title": "Journey to Dzaleka: A Story of Hope",
+  "type": "story",
+  "description": "An oral history account of a Congolese family's journey from Bukavu to Dzaleka Refugee Camp in 2015. The narrator describes the challenges of displacement, the experience of crossing borders, and the sense of community found upon arrival at Dzaleka. This story captures themes of resilience, loss, and rebuilding life in a new place.",
+  "language": "en",
+  "creator": [
+    {
+      "name": "Marie Consolée",
+      "role": "narrator"
+    },
+    {
+      "name": "Jean-Baptiste Mushimiyimana",
+      "role": "interviewer",
+      "affiliation": "Dzaleka Digital Heritage Project"
+    }
+  ],
+  "date": {
+    "created": "2024-03-15",
+    "event_date": "2015-08-22"
+  },
+  "subject": [
+    "oral history",
+    "displacement",
+    "Congo",
+    "journey",
+    "resilience",
+    "community",
+    "arrival"
+  ],
+  "location": {
+    "name": "Dzaleka Refugee Camp",
+    "area": "Community Center",
+    "latitude": -13.7833,
+    "longitude": 33.9833
+  },
+  "format": "text/plain",
+  "rights": {
+    "license": "CC-BY-NC-4.0",
+    "access_level": "public",
+    "holder": "Marie Consolée"
+  },
+  "source": {
+    "contributor": "Dzaleka Digital Heritage Project",
+    "collection": "Oral Histories 2024",
+    "original_format": "audio interview (transcribed)"
+  },
+  "coverage": {
+    "start_date": "2015-01-01",
+    "end_date": "2015-12-31",
+    "period": "2015 displacement and arrival"
+  },
+  "schema_version": "1.0.0"
+}
+```
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Field guide" icon="list" href="/reference/field-guide">
+    Detailed definitions, constraints, and examples for all 15 fields.
+  </Card>
+  <Card title="Heritage item types" icon="tags" href="/reference/item-types">
+    Descriptions and examples for each of the 10 valid `type` values.
+  </Card>
+  <Card title="Interoperability" icon="arrow-right-arrow-left" href="/reference/interoperability">
+    Dublin Core mapping, JSON-LD context, and vocabulary alignment tables.
+  </Card>
+</CardGroup>

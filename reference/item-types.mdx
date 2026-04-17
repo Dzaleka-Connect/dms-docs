@@ -1,0 +1,279 @@
+---
+title: "Heritage Item Types"
+description: "Descriptions and usage guidelines for the 10 allowed values of the DMS type field."
+keywords: ["DMS", "type", "item types", "heritage", "story", "photo", "document", "audio", "video", "event", "map", "artwork", "site", "poem"]
+---
+
+The `type` field categorises every DMS record into one of 10 heritage item types. The value must exactly match one of the enum strings defined in `schema/dms.json`.
+
+<CardGroup cols={2}>
+  <Card title="story" icon="book-open">
+    Oral histories, personal narratives, and written accounts.
+  </Card>
+  <Card title="photo" icon="image">
+    Photographs and photographic images.
+  </Card>
+  <Card title="document" icon="file-text">
+    Administrative records, reports, letters, and certificates.
+  </Card>
+  <Card title="audio" icon="microphone">
+    Sound recordings, music, and audio interviews.
+  </Card>
+  <Card title="video" icon="video">
+    Video recordings and films.
+  </Card>
+  <Card title="event" icon="calendar">
+    Documentation of community events and gatherings.
+  </Card>
+  <Card title="map" icon="map">
+    Maps and spatial representations of the camp.
+  </Card>
+  <Card title="artwork" icon="palette">
+    Paintings, murals, drawings, crafts, sculptures, and installations.
+  </Card>
+  <Card title="site" icon="landmark">
+    Cultural, historical, or community locations and landmarks.
+  </Card>
+  <Card title="poem" icon="feather">
+    Poetry, spoken word, and literary works.
+  </Card>
+</CardGroup>
+
+---
+
+## story
+
+Oral histories, personal narratives, and written accounts. Use this type for first-person accounts of displacement, arrival, daily life, or community experience — whether recorded verbally and transcribed, or composed as written prose.
+
+In the JSON-LD context, `story` maps to `schema:Article`, `foaf:Document`, and `bibo:Document`.
+
+```json story-type.json
+{
+  "id": "b3e7c8a1-4d5f-6e7a-8b9c-0d1e2f3a4b5c",
+  "title": "Journey to Dzaleka: A Story of Hope",
+  "type": "story",
+  "description": "An oral history account of a Congolese family's journey from Bukavu to Dzaleka Refugee Camp in 2015.",
+  "language": "en"
+}
+```
+
+**Suggested creator roles:** `narrator`, `author`, `interviewer`, `interviewee`, `editor`, `translator`
+
+**Common formats:** `text/plain`, `text/html`, `application/pdf`
+
+---
+
+## photo
+
+Photographs and photographic images, including documentary photography, portraits, and community life imagery. Use this type for still images captured by a camera, whether digital or digitised from film.
+
+In the JSON-LD context, `photo` maps to `schema:Photograph` and `foaf:Image`.
+
+```json photo-type.json
+{
+  "id": "a1f2e3d4-5b6c-7d8e-9f0a-1b2c3d4e5f6a",
+  "title": "Market Day at Dzaleka",
+  "type": "photo",
+  "description": "A photograph capturing a busy market day at Dzaleka Refugee Camp, showing vendors and community members along the main market corridor.",
+  "language": "en"
+}
+```
+
+**Suggested creator roles:** `photographer`
+
+**Common formats:** `image/jpeg`, `image/png`, `image/tiff`
+
+---
+
+## document
+
+Administrative records, official reports, letters, registration forms, and certificates. Use this type for text-based items that originated as institutional or formal paperwork — either produced within the camp's administrative structures or by organisations operating there.
+
+In the JSON-LD context, `document` maps to `schema:DigitalDocument`, `foaf:Document`, and `bibo:Document`.
+
+```json document-type.json
+{
+  "id": "e5f6a7b8-c9d0-1e2f-3a4b-5c6d7e8f9a0b",
+  "title": "Community School Registration Records, 2018",
+  "type": "document",
+  "description": "Student registration records from the Dzaleka community school for the academic year 2018, listing enrolled students, grades, and teacher assignments.",
+  "language": "en"
+}
+```
+
+**Suggested creator roles:** `author`, `editor`, `contributor`, `translator`
+
+**Common formats:** `application/pdf`, `text/plain`, `image/jpeg` (scanned document)
+
+---
+
+## audio
+
+Sound recordings including music performances, audio interviews, oral testimonies, radio broadcasts, and spoken-word content not classified as poetry. Use this type when the primary medium is audio, even if a transcript also exists.
+
+In the JSON-LD context, `audio` maps to `schema:AudioObject` and `bibo:AudioDocument`.
+
+```json audio-type.json
+{
+  "id": "d4e5f6a7-b8c9-0d1e-2f3a-4b5c6d7e8f9a",
+  "title": "Traditional Songs of the Great Lakes Region",
+  "type": "audio",
+  "description": "A recording of traditional songs performed by members of the Dzaleka cultural group, featuring songs from Burundi, Rwanda, and the DRC.",
+  "language": "rw"
+}
+```
+
+**Suggested creator roles:** `recorder`, `interviewer`, `interviewee`, `narrator`, `contributor`
+
+**Common formats:** `audio/mpeg`, `audio/wav`, `audio/ogg`
+
+---
+
+## video
+
+Video recordings, documentary films, and filmed events. Use this type when the primary medium is moving image, whether produced professionally or as community documentation.
+
+In the JSON-LD context, `video` maps to `schema:VideoObject` and `bibo:AudioVisualDocument`.
+
+```json video-type.json
+{
+  "id": "c3d4e5f6-a7b8-9c0d-1e2f-3a4b5c6d7e8f",
+  "title": "World Refugee Day Celebration 2024 — Highlights",
+  "type": "video",
+  "description": "A highlights reel from the World Refugee Day celebration held at Dzaleka in June 2024, featuring performances, speeches, and community activities.",
+  "language": "en"
+}
+```
+
+**Suggested creator roles:** `recorder`, `editor`, `contributor`
+
+**Common formats:** `video/mp4`, `video/webm`, `video/ogg`
+
+---
+
+## event
+
+Documentation of community events, gatherings, celebrations, and public meetings. Use this type for records that describe or represent an event that occurred, rather than the artefact produced at the event (use the appropriate type for the artefact itself).
+
+In the JSON-LD context, `event` maps to `schema:Event` and `bibo:Event`.
+
+```json event-type.json
+{
+  "id": "f7a8b9c0-d1e2-3f4a-5b6c-7d8e9f0a1b2c",
+  "title": "World Refugee Day Celebration 2024",
+  "type": "event",
+  "description": "Annual World Refugee Day celebration held at Dzaleka Refugee Camp on 20 June 2024, featuring cultural performances, sports activities, and community speeches.",
+  "language": "en"
+}
+```
+
+**Suggested creator roles:** `organizer`, `contributor`, `recorder`
+
+**Common formats:** `text/plain`, `application/pdf`, `text/html`
+
+---
+
+## map
+
+Maps and spatial representations of the camp or its surroundings. Use this type for cartographic materials including hand-drawn camp layouts, GIS-produced maps, and spatial planning documents.
+
+In the JSON-LD context, `map` maps to `schema:Map` and `foaf:Document`.
+
+```json map-type.json
+{
+  "id": "a9b0c1d2-e3f4-5a6b-7c8d-9e0f1a2b3c4d",
+  "title": "Dzaleka Camp Layout and Infrastructure Map, 2022",
+  "type": "map",
+  "description": "A spatial map of Dzaleka Refugee Camp showing residential sections, water points, health facilities, schools, and market areas as of 2022.",
+  "language": "en"
+}
+```
+
+**Suggested creator roles:** `author`, `contributor`
+
+**Common formats:** `image/png`, `image/svg+xml`, `application/pdf`, `application/geo+json`
+
+---
+
+## artwork
+
+Visual artworks including paintings, murals, drawings, handmade crafts, sculptures, and installations. Use this type for items whose primary value lies in their aesthetic or artistic expression rather than their informational content.
+
+In the JSON-LD context, `artwork` maps to `schema:VisualArtwork` and `foaf:Image`.
+
+```json artwork-type.json
+{
+  "id": "b0c1d2e3-f4a5-6b7c-8d9e-0f1a2b3c4d5e",
+  "title": "Child Early Marriage Awareness Mural",
+  "type": "artwork",
+  "description": "A public mural painted on the wall of the Dzaleka community centre raising awareness about child early marriage, created by the Tumaini Festival art programme.",
+  "language": "en"
+}
+```
+
+**Suggested creator roles:** `artist`, `muralist`, `sculptor`, `contributor`
+
+**Common formats:** `image/jpeg`, `image/png`, `image/tiff`
+
+---
+
+## site
+
+Cultural, historical, or community locations and landmarks within or associated with the camp. Use this type for records that document a place itself — its history, significance, and physical characteristics — rather than an item found there.
+
+In the JSON-LD context, `site` maps to `schema:Place` and `schema:LandmarksOrHistoricalBuildings`.
+
+```json site-type.json
+{
+  "id": "c1d2e3f4-a5b6-7c8d-9e0f-1a2b3c4d5e6f",
+  "title": "Dzaleka Health Centre",
+  "type": "site",
+  "description": "The primary health facility serving residents of Dzaleka Refugee Camp, operating since the camp's establishment and providing medical care to over 50,000 registered refugees.",
+  "language": "en"
+}
+```
+
+**Suggested creator roles:** `contributor`, `curator`
+
+**Common formats:** `text/plain`, `application/pdf`, `image/jpeg`
+
+---
+
+## poem
+
+Poetry, spoken-word pieces, and literary works. Use this type for items whose form is explicitly poetic — including written verse, performed spoken word, and song lyrics presented as literary works.
+
+In the JSON-LD context, `poem` maps to `schema:CreativeWork` and `bibo:Document`.
+
+```json poem-type.json
+{
+  "id": "b3c4d5e6-f7a8-9b0c-1d2e-3f4a5b6c7d8e",
+  "title": "Home Is a Word I Carry",
+  "type": "poem",
+  "description": "A poem reflecting on the experience of displacement and the meaning of home for refugees living in Dzaleka. Written in English with phrases in Swahili.",
+  "language": "en"
+}
+```
+
+**Suggested creator roles:** `poet`, `author`, `narrator`
+
+**Common formats:** `text/plain`, `text/html`, `audio/mpeg` (spoken word recording)
+
+---
+
+## Type selection guide
+
+<AccordionGroup>
+  <Accordion title="My item is a transcript of a recorded interview">
+    Use `story`. The transcript is the primary artefact — the oral narrative is what the record describes. If the audio recording also needs its own record, create a separate `audio` record and link them using the `relation` field.
+  </Accordion>
+  <Accordion title="My item is a photograph of a mural">
+    Use `artwork`. The subject of the photograph is the artwork. If the photograph itself is the heritage item (e.g., documentary photography of daily life), use `photo`.
+  </Accordion>
+  <Accordion title="My item is a written account of an event">
+    Use `document` if it is an official report or administrative record. Use `story` if it is a personal or community narrative. Use `event` if the record's primary purpose is to document the event itself.
+  </Accordion>
+  <Accordion title="My item is a song recorded as audio">
+    Use `audio`. If you also have sheet music or lyrics as a separate document, create a second record of type `document` or `poem` and link both records using the `relation` field.
+  </Accordion>
+</AccordionGroup>

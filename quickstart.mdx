@@ -1,0 +1,190 @@
+---
+title: Quick start
+description: Install DMS and create your first validated heritage metadata record in five minutes.
+---
+
+This guide walks you from a fresh environment to a working, schema-valid DMS record. The whole process takes about five minutes.
+
+<Note>
+  DMS requires **Python 3.9 or newer**. Run `python3 --version` to check before you begin.
+</Note>
+
+<Steps>
+  <Step title="Install DMS">
+    Clone the repository and install the `dms` CLI in development mode:
+
+    ```bash
+    git clone https://github.com/Dzaleka-Connect/Dzaleka-Metadata-Standard.git
+    cd dzaleka-metadata-standard
+    pip install -e .
+    ```
+
+    The `-e` flag installs the package in editable mode, which ensures the schema files bundled in the repository are resolved correctly at runtime.
+  </Step>
+
+  <Step title="Verify the installation">
+    Confirm the CLI is available and inspect the schema:
+
+    ```bash
+    dms --version
+    dms info
+    ```
+
+    `dms --version` prints the installed CLI version. `dms info` prints the schema version and a table of all fields, their required status, allowed types, and creator roles:
+
+    ```
+    dms, version 1.0.0
+    ```
+
+    ```
+    ╔══════════════════════════════════════════════════════════╗
+    ║  Dzaleka Metadata Standard (DMS)                        ║
+    ║  An open-source metadata standard for documenting       ║
+    ║  and sharing Dzaleka's digital heritage.                ║
+    ║                                                          ║
+    ║    CLI version:    1.0.0                                 ║
+    ║    Schema version: 1.0.0                                 ║
+    ╚══════════════════════════════════════════════════════════╝
+    ```
+  </Step>
+
+  <Step title="Create a record">
+    DMS offers two ways to create a record. Choose the one that fits your workflow:
+
+    <Tabs>
+      <Tab title="Web UI (recommended)">
+        The DMS Vault is a local browser-based form with live validation feedback. It is the easiest way to create well-formed records without writing JSON by hand.
+
+        ```bash
+        dms web --port 8080 --dir records/
+        ```
+
+        This launches the web interface at `http://localhost:8080` and saves records to the `records/` directory. The UI provides:
+
+        - Structured input fields for every schema property
+        - Live validation against the DMS schema
+        - Multi-value entry for creators and subject tags
+        - One-click copy of the raw JSON or JSON-LD output
+
+        <Tip>
+          Use `dms web` when onboarding new contributors or when entering records with many multi-value fields like creators and subjects.
+        </Tip>
+      </Tab>
+      <Tab title="CLI wizard">
+        The `dms init` command runs an interactive terminal wizard that prompts for each field in turn:
+
+        ```bash
+        # General interactive wizard (prompts for type first)
+        dms init
+
+        # Skip the type prompt by pre-setting it
+        dms init --type story
+
+        # Save directly to a specific file
+        dms init --type story --output records/my-story.json
+        ```
+
+        The wizard prompts for each required and recommended field. Press **Enter** to skip optional fields. When finished, it writes a schema-valid JSON file to disk.
+      </Tab>
+    </Tabs>
+  </Step>
+
+  <Step title="Validate the record">
+    Once the record is saved, validate it against the DMS schema:
+
+    ```bash
+    # Validate a single file
+    dms validate records/my-story.json
+
+    # Validate all .json files in a directory
+    dms validate --dir records/
+    ```
+
+    A valid record prints a confirmation panel:
+
+    ```
+    ╭────────────────────────────────────────╮
+    │ ✓ VALID  records/my-story.json         │
+    ╰────────────────────────────────────────╯
+      ⚠ Recommended field 'Format' is not provided.
+    ```
+
+    Errors (marked `✗`) mean the record does not conform to the schema and must be fixed. Warnings (`⚠`) flag missing recommended fields — the record is still valid, but the missing fields reduce discoverability.
+
+    <Warning>
+      `dms validate` exits with a non-zero status code when any record is invalid, making it safe to use in CI pipelines.
+    </Warning>
+  </Step>
+</Steps>
+
+## Example record
+
+The following is a complete, schema-valid DMS record from `examples/story.json`. You can use it as a reference or starting point:
+
+```json story.json
+{
+  "id": "b3e7c8a1-4d5f-6e7a-8b9c-0d1e2f3a4b5c",
+  "title": "Journey to Dzaleka: A Story of Hope",
+  "type": "story",
+  "description": "An oral history account of a Congolese family's journey from Bukavu to Dzaleka Refugee Camp in 2015. The narrator describes the challenges of displacement, the experience of crossing borders, and the sense of community found upon arrival at Dzaleka. This story captures themes of resilience, loss, and rebuilding life in a new place.",
+  "language": "en",
+  "creator": [
+    {
+      "name": "Marie Consolée",
+      "role": "narrator"
+    },
+    {
+      "name": "Jean-Baptiste Mushimiyimana",
+      "role": "interviewer",
+      "affiliation": "Dzaleka Digital Heritage Project"
+    }
+  ],
+  "date": {
+    "created": "2024-03-15",
+    "event_date": "2015-08-22"
+  },
+  "subject": [
+    "oral history",
+    "displacement",
+    "Congo",
+    "journey",
+    "resilience",
+    "community",
+    "arrival"
+  ],
+  "location": {
+    "name": "Dzaleka Refugee Camp",
+    "area": "Community Center",
+    "latitude": -13.7833,
+    "longitude": 33.9833
+  },
+  "format": "text/plain",
+  "rights": {
+    "license": "CC-BY-NC-4.0",
+    "access_level": "public",
+    "holder": "Marie Consolée"
+  },
+  "source": {
+    "contributor": "Dzaleka Digital Heritage Project",
+    "collection": "Oral Histories 2024",
+    "original_format": "audio interview (transcribed)"
+  },
+  "coverage": {
+    "start_date": "2015-01-01",
+    "end_date": "2015-12-31",
+    "period": "2015 displacement and arrival"
+  },
+  "schema_version": "1.0.0"
+}
+```
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Field guide" icon="book-open" href="/reference/field-guide">
+    Detailed definitions and allowed values for every schema field.
+  </Card>
+  <Card title="CLI reference" icon="terminal" href="/reference/commands/init">
+    Full reference for all `dms` commands: search, export, stats, report, and more.
+  </Card>
+</CardGroup>

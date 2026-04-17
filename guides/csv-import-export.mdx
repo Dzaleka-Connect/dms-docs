@@ -1,0 +1,98 @@
+---
+title: "CSV Import and Export"
+description: "Convert spreadsheet data to DMS JSON records and export records back to CSV for use in other tools."
+keywords: ["dms", "csv", "convert", "import", "export", "spreadsheet", "batch"]
+---
+
+DMS can convert metadata between CSV (spreadsheet) format and DMS JSON records in both directions. This makes it easy to bulk-import records prepared in a spreadsheet application, or to export your archive for use in Excel, Google Sheets, or data analysis tools.
+
+## CSV column format
+
+The DMS CSV format uses a flat set of columns that map to the nested JSON structure. Multi-value fields use `|` (pipe) as a separator within a single cell.
+
+```
+id,title,type,description,language,creator_name,creator_role,
+date_created,date_event,subject,location_name,location_area,
+location_latitude,location_longitude,format,rights_license,
+rights_access_level,rights_holder,source_contributor,
+source_collection,source_original_format,schema_version
+```
+
+### Multi-value fields
+
+Three columns accept multiple values separated by `|`:
+
+| Column | Example value | Maps to |
+|---|---|---|
+| `creator_name` | `Marie Consolée\|Jean-Baptiste Mushimiyimana` | `creator[].name` |
+| `creator_role` | `narrator\|interviewer` | `creator[].role` |
+| `subject` | `oral history\|displacement\|Congo` | `subject[]` |
+
+The `creator_name` and `creator_role` columns are positional: the first name is paired with the first role, the second name with the second role, and so on.
+
+### Example rows from batch.csv
+
+```csv batch.csv
+id,title,type,description,language,creator_name,creator_role,date_created,date_event,subject,location_name,location_area,location_latitude,location_longitude,format,rights_license,rights_access_level,rights_holder,source_contributor,source_collection,source_original_format,schema_version
+b3e7c8a1-4d5f-6e7a-8b9c-0d1e2f3a4b5c,Journey to Dzaleka: A Story of Hope,story,"An oral history account of a Congolese family's journey from Bukavu to Dzaleka Refugee Camp in 2015.",en,Marie Consolée|Jean-Baptiste Mushimiyimana,narrator|interviewer,2024-03-15,2015-08-22,oral history|displacement|Congo|journey|resilience,Dzaleka Refugee Camp,Community Center,-13.7833,33.9833,text/plain,CC-BY-NC-4.0,public,Marie Consolée,Dzaleka Digital Heritage Project,Oral Histories 2024,audio interview (transcribed),1.0.0
+d7e8f9a0-b1c2-d3e4-f5a6-b7c8d9e0f1a2,Traditional Songs of the Great Lakes Region,audio,"Field recording of traditional songs performed by Burundian elder women.",rw,Espérance Ndayisaba|Grace Mutoni|Samuel Habimana,narrator|narrator|recorder,2024-04-08,2024-03-22,traditional music|songs|Burundi|cultural heritage|women,Dzaleka Refugee Camp,Community Center,-13.7833,33.9833,audio/mpeg,CC-BY-NC-4.0,community-only,Dzaleka Heritage Audio Archive,Dzaleka Heritage Audio Archive,Traditional Music Archive,live field recording,1.0.0
+```
+
+## Importing CSV to JSON
+
+```bash
+dms convert csv2json batch.csv
+```
+
+This reads every row in `batch.csv` and writes a JSON array of DMS records.
+
+<Note>
+  By default the output file is named `<stem>_converted.json`. For a file named `batch.csv` the output will be `batch_converted.json`. Use `--output` to choose a different path:
+
+  ```bash
+  dms convert csv2json batch.csv --output records/imported.json
+  ```
+</Note>
+
+If you pass a directory path as `--output`, each row is written as an individual file named `<type>_<id[:8]>.json`:
+
+```bash
+dms convert csv2json batch.csv --output records/
+```
+
+Rows without an `id` value are assigned a new UUID automatically.
+
+## Exporting JSON to CSV
+
+```bash
+dms convert json2csv records/story_b3e7c8a1.json
+```
+
+Both a single JSON object and a JSON array of records are accepted. By default the output path is the same as the input with the extension changed to `.csv`:
+
+<Note>
+  `json2csv` defaults to `<input-stem>.csv`. For `story_b3e7c8a1.json` the output will be `story_b3e7c8a1.csv`. Override with `--output`:
+
+  ```bash
+  dms convert json2csv records/story_b3e7c8a1.json --output exports/story.csv
+  ```
+</Note>
+
+## Round-trip workflow
+
+You can convert records back and forth between formats without data loss:
+
+```bash
+# 1. Import a spreadsheet export to JSON
+dms convert csv2json data.csv --output data.json
+
+# 2. Edit records in data.json, then validate
+dms validate data.json
+
+# 3. Export back to CSV for sharing with non-technical collaborators
+dms convert json2csv data.json --output data-export.csv
+```
+
+<Warning>
+  The CSV format flattens nested JSON fields. The `coverage` object (`start_date`, `end_date`, `period`) and the `relation` array have no corresponding CSV columns and will not survive a round-trip through CSV. If your records use these fields, work directly in JSON.
+</Warning>

@@ -1,0 +1,80 @@
+---
+title: info
+description: Display the DMS schema version, a table of all fields, and the enumerated values for type, creator roles, and access levels.
+---
+
+## Synopsis
+
+```bash
+dms info
+```
+
+## Description
+
+`dms info` prints a summary of the installed DMS schema to the terminal. It is useful for quickly checking what version of the schema is installed, reviewing which fields are required, and looking up the full list of allowed enum values for `type`, creator `role`, and `rights.access_level`.
+
+The command produces three sections:
+
+1. **Header panel** — CLI version and schema version.
+2. **Schema Fields table** — all 15 fields with their required status and descriptions.
+3. **Enum value lists** — the complete allowed values for `type`, creator roles, and access levels.
+
+## Options
+
+`dms info` takes no options or arguments.
+
+## Terminal output
+
+```text
+╔══════════════════════════════════════════════════════════╗
+║  Dzaleka Metadata Standard (DMS)                        ║
+║  An open-source metadata standard for documenting       ║
+║  and sharing Dzaleka's digital heritage.                ║
+║                                                          ║
+║    CLI version:    1.0.0                                 ║
+║    Schema version: 1.0.0                                 ║
+╚══════════════════════════════════════════════════════════╝
+
+ Schema Fields
+ ╭──────────────────┬──────────┬──────────────────────────────────────────────╮
+ │ Field            │ Required │ Description                                  │
+ ├──────────────────┼──────────┼──────────────────────────────────────────────┤
+ │ id               │ ✓ Yes    │ Unique identifier for the record (UUID v4).  │
+ │ title            │ ✓ Yes    │ Name or title of the heritage item.          │
+ │ type             │ ✓ Yes    │ Category of the heritage item.               │
+ │ description      │ ✓ Yes    │ Narrative context or summary.                │
+ │ language         │ ✓ Yes    │ Primary language (IETF BCP 47).              │
+ │ creator          │ No       │ Person(s) or organization(s) who created it. │
+ │ date             │ No       │ Date information associated with the item.   │
+ │ subject          │ No       │ Tags or keywords describing the content.     │
+ │ location         │ No       │ Geographic information.                      │
+ │ rights           │ No       │ Licensing and access information.            │
+ │ source           │ No       │ Origin, contributor, or collection.          │
+ │ format           │ No       │ MIME type of the digital object.             │
+ │ relation         │ No       │ IDs of related DMS records.                  │
+ │ coverage         │ No       │ Temporal extent of the item's content.       │
+ │ schema_version   │ No       │ DMS schema version this record conforms to.  │
+ ╰──────────────────┴──────────┴──────────────────────────────────────────────╯
+
+  Heritage Types: story, photo, document, audio, video, event, map, artwork, site, poem
+  Creator Roles:  author, photographer, interviewer, interviewee, narrator, artist,
+                  muralist, sculptor, poet, curator, recorder, editor, translator,
+                  organizer, contributor
+  Access Levels:  public, restricted, community-only
+```
+
+## Example
+
+```bash
+dms info
+```
+
+## Notes
+
+<Tip>
+  Use `dms info` when you are unsure of the exact spelling for a `type`, creator `role`, or `access_level` value. The output lists every allowed enum value so you can copy the correct string directly.
+</Tip>
+
+<Note>
+  The schema version shown by `dms info` reflects the schema bundled with your installation. If you update the repository, re-run `pip install -e .` to pick up any schema changes.
+</Note>

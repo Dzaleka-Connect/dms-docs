@@ -1,0 +1,319 @@
+---
+title: "Field Guide"
+description: "Complete reference for all 15 fields in the Dzaleka Metadata Standard, with types, constraints, and JSON examples."
+keywords: ["DMS", "fields", "metadata", "schema", "reference", "Dublin Core"]
+---
+
+This guide covers every field defined in `schema/dms.json`. Fields are grouped by tier: [Required](#required-fields), [Recommended](#recommended-fields), and [Optional](#optional-fields).
+
+<Tip>
+  Generate a new record skeleton with `dms init`. The interactive wizard prompts for all required and recommended fields and auto-generates the `id` UUID.
+</Tip>
+
+---
+
+## Required fields
+
+These five fields must be present in every DMS record. A record missing any of them will fail `dms validate`.
+
+<ParamField body="id" type="string" required>
+  Unique identifier for the record. Must be a valid **UUID v4** in the format `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`. Generated automatically by `dms init`. Maps to `dc:identifier`.
+
+  ```json
+  "id": "b3e7c8a1-4d5f-6e7a-8b9c-0d1e2f3a4b5c"
+  ```
+
+  <Warning>
+    UUIDs must be unique across your entire collection. Never reuse or manually duplicate an `id` value.
+  </Warning>
+</ParamField>
+
+<ParamField body="title" type="string" required>
+  Name or title of the heritage item. Minimum 1 character, maximum 500 characters. Maps to `dc:title`.
+
+  Use the original title if one exists. Include dates or locations when helpful for disambiguation. Avoid generic titles such as "Photo" or "Document".
+
+  ```json
+  "title": "Journey to Dzaleka: A Story of Hope"
+  ```
+
+  ```json
+  "title": "Community School Registration Records, 2018"
+  ```
+</ParamField>
+
+<ParamField body="type" type="string" required>
+  Category of the heritage item. Must be one of the 10 allowed enum values. Maps to `dc:type`.
+
+  | Value | Use for |
+  |---|---|
+  | `story` | Oral histories, personal narratives, written accounts |
+  | `photo` | Photographs, images |
+  | `document` | Administrative records, reports, letters, certificates |
+  | `audio` | Sound recordings, music, interviews |
+  | `video` | Video recordings, films |
+  | `event` | Documentation of community events and gatherings |
+  | `map` | Maps, spatial representations of the camp |
+  | `artwork` | Paintings, murals, drawings, crafts, sculptures, installations |
+  | `site` | Cultural, historical, or community locations and landmarks |
+  | `poem` | Poetry, spoken word, and literary works |
+
+  ```json
+  "type": "story"
+  ```
+
+  See [Heritage Item Types](/reference/item-types) for full descriptions and examples of each value.
+</ParamField>
+
+<ParamField body="description" type="string" required>
+  Narrative context or summary of the heritage item. Minimum 1 character, no maximum length. Maps to `dc:description`.
+
+  This is one of the most important fields for discoverability. Explain what the item is and why it matters. Include relevant historical or cultural context, and mention the people, places, or events featured. Write in the language specified by the `language` field.
+
+  ```json
+  "description": "An oral history account of a Congolese family's journey from Bukavu to Dzaleka Refugee Camp in 2015. The narrator describes the challenges of displacement, the experience of crossing borders, and the sense of community found upon arrival."
+  ```
+</ParamField>
+
+<ParamField body="language" type="string" required>
+  Primary language of the content, expressed as an **IETF BCP 47** language code. Pattern: `^[a-z]{2,3}(-[A-Z]{2,4})?$`. Maps to `dc:language`.
+
+  | Code | Language |
+  |---|---|
+  | `en` | English |
+  | `sw` | Swahili |
+  | `fr` | French |
+  | `rw` | Kinyarwanda |
+  | `ki` | Kirundi |
+  | `ln` | Lingala |
+  | `so` | Somali |
+  | `ny` | Chichewa |
+
+  ```json
+  "language": "en"
+  ```
+
+  ```json
+  "language": "sw"
+  ```
+</ParamField>
+
+---
+
+## Recommended fields
+
+These fields are strongly recommended for complete, interoperable records. They are not enforced by the schema validator, but omitting them reduces discoverability and archival value.
+
+<ParamField body="creator" type="Creator[]">
+  Person(s) or organization(s) who created the heritage item. Must contain at least one Creator object if present. Maps to `dc:creator`.
+
+  ```json
+  "creator": [
+    {
+      "name": "Marie Consolée",
+      "role": "narrator"
+    },
+    {
+      "name": "Jean-Baptiste Mushimiyimana",
+      "role": "interviewer",
+      "affiliation": "Dzaleka Digital Heritage Project"
+    }
+  ]
+  ```
+
+  <Expandable title="Creator object properties">
+    <ParamField body="name" type="string" required>
+      Full name of the creator. Minimum 1 character.
+    </ParamField>
+    <ParamField body="role" type="string">
+      Role of the creator in producing this item. Must be one of the following enum values:
+
+      `author`, `photographer`, `interviewer`, `interviewee`, `narrator`, `artist`, `muralist`, `sculptor`, `poet`, `curator`, `recorder`, `editor`, `translator`, `organizer`, `contributor`
+    </ParamField>
+    <ParamField body="affiliation" type="string">
+      Organization or community the creator is affiliated with (e.g., `"Dzaleka Digital Heritage Project"`, `"Dzaleka Writers Collective"`).
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+<ParamField body="date" type="object">
+  Date information associated with the item. All date values use **ISO 8601** format (`YYYY-MM-DD`). Maps to `dc:date`, `dcterms:created`, and `dcterms:modified`.
+
+  ```json
+  "date": {
+    "created": "2024-03-15",
+    "event_date": "2015-08-22"
+  }
+  ```
+
+  <Expandable title="DateInfo object properties">
+    <ParamField body="created" type="string">
+      Date the metadata record was created (ISO 8601, e.g., `"2024-06-20"`). Maps to `dcterms:created`.
+    </ParamField>
+    <ParamField body="modified" type="string">
+      Date the record was last modified. Maps to `dcterms:modified`.
+    </ParamField>
+    <ParamField body="event_date" type="string">
+      Date of the event or original creation of the heritage item — not the metadata record itself. Maps to `dcterms:date`.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+<ParamField body="subject" type="string[]">
+  Tags or keywords describing the content. Each item must be a non-empty string. All values must be unique within the array. Maps to `dc:subject`.
+
+  Use lowercase for consistency. Include both broad and specific terms, and add cultural or community-specific terms where appropriate. Aim for 3–10 tags per record.
+
+  ```json
+  "subject": ["oral history", "displacement", "Congo", "journey", "resilience", "community"]
+  ```
+</ParamField>
+
+<ParamField body="location" type="object">
+  Geographic information associated with the item. Maps to `dcterms:spatial`.
+
+  ```json
+  "location": {
+    "name": "Dzaleka Refugee Camp",
+    "area": "Community Center",
+    "latitude": -13.7833,
+    "longitude": 33.9833
+  }
+  ```
+
+  <Expandable title="Location object properties">
+    <ParamField body="name" type="string" required>
+      Human-readable place name (e.g., `"Dzaleka Refugee Camp"`). Minimum 1 character.
+    </ParamField>
+    <ParamField body="area" type="string">
+      Specific area or section within the location. This is a **Dzaleka-specific extension** for identifying camp sections (e.g., `"Section A"`, `"Market Area"`, `"Community Center"`). Maps to `dms:campArea`.
+    </ParamField>
+    <ParamField body="latitude" type="number">
+      Latitude in decimal degrees. Range: -90 to 90. Maps to `geo:lat`.
+    </ParamField>
+    <ParamField body="longitude" type="number">
+      Longitude in decimal degrees. Range: -180 to 180. Maps to `geo:long`.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+<ParamField body="rights" type="object">
+  Licensing, access, and intellectual property information. Maps to `dc:rights`.
+
+  ```json
+  "rights": {
+    "license": "CC-BY-NC-4.0",
+    "access_level": "public",
+    "holder": "Marie Consolée"
+  }
+  ```
+
+  <Expandable title="Rights object properties">
+    <ParamField body="license" type="string">
+      License identifier, preferably an **SPDX** short identifier (e.g., `"CC-BY-4.0"`, `"CC-BY-NC-4.0"`, `"CC0-1.0"`). Maps to `dcterms:license`.
+    </ParamField>
+    <ParamField body="access_level" type="string">
+      Who can access this item. Must be one of:
+
+      | Value | Meaning |
+      |---|---|
+      | `public` | Open to everyone |
+      | `restricted` | Requires permission to access |
+      | `community-only` | Available only to Dzaleka community members |
+
+      Maps to `dms:accessLevel`.
+    </ParamField>
+    <ParamField body="holder" type="string">
+      Name of the rights holder or copyright owner. Maps to `dcterms:rightsHolder`.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+---
+
+## Optional fields
+
+These fields provide additional provenance, format, and relationship context. Include them when the information is available.
+
+<ParamField body="source" type="object">
+  Information about the origin, contributor, or archival collection. Maps to `dc:source`.
+
+  ```json
+  "source": {
+    "contributor": "Dzaleka Digital Heritage Project",
+    "collection": "Oral Histories 2024",
+    "original_format": "audio interview (transcribed)"
+  }
+  ```
+
+  <Expandable title="Source object properties">
+    <ParamField body="contributor" type="string">
+      Person or organization that contributed this item to the archive. Maps to `dcterms:contributor`.
+    </ParamField>
+    <ParamField body="collection" type="string">
+      Named collection this item belongs to (e.g., `"Oral Histories 2024"`, `"Camp Maps"`, `"Dzaleka Poetry Archive"`). Maps to `bibo:Collection`.
+    </ParamField>
+    <ParamField body="original_format" type="string">
+      Physical or original format of the item before digitization (e.g., `"handwritten notebook"`, `"cassette tape"`, `"35mm film"`). Maps to `dms:originalFormat`.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+<ParamField body="format" type="string">
+  MIME type of the digital object. Pattern: `^[a-z]+/[a-z0-9.+-]+$`. Maps to `dc:format`.
+
+  Common values: `image/jpeg`, `image/png`, `audio/mpeg`, `video/mp4`, `application/pdf`, `text/plain`, `text/html`.
+
+  ```json
+  "format": "image/jpeg"
+  ```
+</ParamField>
+
+<ParamField body="relation" type="string[]">
+  IDs of related DMS records. Each value must be a valid UUID v4. All values must be unique within the array. Maps to `dc:relation`.
+
+  Use this field to link items that belong together — for example, a story record and its associated audio recording, or a photograph and the event it documents.
+
+  ```json
+  "relation": [
+    "a1f2e3d4-5b6c-7d8e-9f0a-1b2c3d4e5f6a",
+    "c9d8e7f6-a5b4-3c2d-1e0f-9a8b7c6d5e4f"
+  ]
+  ```
+</ParamField>
+
+<ParamField body="coverage" type="object">
+  Temporal extent or scope of the item's content. Maps to `dc:coverage`.
+
+  ```json
+  "coverage": {
+    "start_date": "2015-01-01",
+    "end_date": "2015-12-31",
+    "period": "2015 displacement and arrival"
+  }
+  ```
+
+  <Expandable title="Coverage object properties">
+    <ParamField body="start_date" type="string">
+      Start date of the period covered by the item. ISO 8601 format (`YYYY-MM-DD`). Maps to `schema:startDate`.
+    </ParamField>
+    <ParamField body="end_date" type="string">
+      End date of the period covered by the item. ISO 8601 format (`YYYY-MM-DD`). Maps to `schema:endDate`.
+    </ParamField>
+    <ParamField body="period" type="string">
+      Human-readable description of the time period (e.g., `"Early settlement era"`, `"2020–2024"`, `"Post-2010 community growth"`). Maps to `dcterms:temporal`.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+<ParamField body="schema_version" type="string" default="1.0.0">
+  Version of the DMS schema this record conforms to. Must be the constant string `"1.0.0"` for the current schema. Maps to `schema:schemaVersion`.
+
+  ```json
+  "schema_version": "1.0.0"
+  ```
+
+  <Tip>
+    Including `schema_version` makes it possible to automatically detect and migrate records if the schema is updated in a future release.
+  </Tip>
+</ParamField>

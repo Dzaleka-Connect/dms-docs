@@ -1,0 +1,79 @@
+---
+title: "Dzaleka Metadata Standard"
+description: "An open-source metadata specification and Python CLI toolkit for describing, organising, and sharing digital heritage content from Dzaleka Refugee Camp."
+---
+
+The **Dzaleka Metadata Standard (DMS)** is an open-source metadata specification and Python toolkit designed to preserve and share digital heritage from Dzaleka Refugee Camp in Malawi. It provides a standardised, Dublin Core-compatible schema for heritage items — stories, photos, documents, audio, events, and more — along with a full CLI and local web interface for creating, validating, and exporting records.
+
+<CardGroup cols={2}>
+  <Card title="Quick Start" icon="rocket" href="/quickstart">
+    Create your first heritage metadata record in minutes
+  </Card>
+  <Card title="Installation" icon="download" href="/installation">
+    Install the DMS CLI tools on your system
+  </Card>
+  <Card title="Field Guide" icon="book-open" href="/reference/field-guide">
+    Detailed definitions for every schema field
+  </Card>
+  <Card title="CLI Reference" icon="terminal" href="/reference/commands/init">
+    Complete reference for all DMS commands
+  </Card>
+</CardGroup>
+
+## What DMS provides
+
+<CardGroup cols={2}>
+  <Card title="Metadata schema" icon="database">
+    A machine-readable JSON Schema (Draft 2020-12) with 15 fields based on Dublin Core, available in JSON, YAML, and JSON-LD formats.
+  </Card>
+  <Card title="CLI toolkit" icon="square-terminal">
+    Commands for creating, validating, searching, converting, and exporting heritage metadata records from the terminal.
+  </Card>
+  <Card title="Web UI (DMS Vault)" icon="browser">
+    A local web interface for building and managing records without touching the terminal — with live validation feedback.
+  </Card>
+  <Card title="Linked data export" icon="diagram-project">
+    Export records as JSON-LD mapped to FOAF, Dublin Core, Schema.org, and W3C Geo for semantic web publishing.
+  </Card>
+</CardGroup>
+
+## Get started in three steps
+
+<Steps>
+  <Step title="Install DMS">
+    Clone the repository and install the CLI tools with pip.
+
+    ```bash
+    git clone https://github.com/Dzaleka-Connect/Dzaleka-Metadata-Standard.git
+    cd dzaleka-metadata-standard
+    pip install -e .
+    ```
+  </Step>
+  <Step title="Create your first record">
+    Run the interactive wizard or launch the web UI to create a metadata record.
+
+    ```bash
+    # Interactive terminal wizard
+    dms init --type story
+
+    # Or launch the local web UI
+    dms web --port 8080 --dir records/
+    ```
+  </Step>
+  <Step title="Validate and export">
+    Validate your record against the schema and export it for sharing.
+
+    ```bash
+    dms validate records/my-story.json
+    dms export records/my-story.json
+    ```
+  </Step>
+</Steps>
+
+## Supported heritage types
+
+DMS supports ten categories of heritage content: `story`, `photo`, `document`, `audio`, `video`, `event`, `map`, `artwork`, `site`, and `poem` — each mapping to Dublin Core for broad interoperability.
+
+<Note>
+  All DMS records conform to the Dublin Core Metadata Initiative and are compatible with linked data systems via the included JSON-LD context.
+</Note>

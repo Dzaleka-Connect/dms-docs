@@ -1,0 +1,240 @@
+---
+title: "Interoperability"
+description: "How the Dzaleka Metadata Standard maps to Dublin Core, JSON-LD linked data, and other standard vocabularies."
+keywords: ["DMS", "Dublin Core", "JSON-LD", "linked data", "interoperability", "FOAF", "BIBO", "Schema.org", "CSV", "RDF"]
+---
+
+DMS is designed to work with existing archival and semantic web standards. Every field maps to a recognised vocabulary, and three machine-readable schema formats make it possible to consume DMS records with standard tooling in any language or platform.
+
+<Note>
+  DMS is fully compatible with **Dublin Core** — the most widely used metadata standard for digital heritage and library resources. Every DMS field maps directly to a Dublin Core element or term, allowing DMS records to be harvested, indexed, and exchanged by any system that understands Dublin Core.
+</Note>
+
+---
+
+## Dublin Core field mapping
+
+All 15 DMS fields map to a `dc:` or `dcterms:` property. Fields with no equivalent Dublin Core term use a `dms:` or `schema:` extension property.
+
+| DMS field | Dublin Core / extension mapping | Namespace |
+|---|---|---|
+| `id` | `dc:identifier` | Dublin Core Elements |
+| `title` | `dc:title` | Dublin Core Elements |
+| `type` | `dc:type` | Dublin Core Elements |
+| `description` | `dc:description` | Dublin Core Elements |
+| `language` | `dc:language` | Dublin Core Elements |
+| `creator` | `dc:creator` | Dublin Core Elements |
+| `date` | `dc:date` | Dublin Core Elements |
+| `date.created` | `dcterms:created` | Dublin Core Terms |
+| `date.modified` | `dcterms:modified` | Dublin Core Terms |
+| `date.event_date` | `dcterms:date` | Dublin Core Terms |
+| `subject` | `dc:subject` | Dublin Core Elements |
+| `location` | `dcterms:spatial` | Dublin Core Terms |
+| `location.latitude` | `geo:lat` | W3C Geo |
+| `location.longitude` | `geo:long` | W3C Geo |
+| `location.area` | `dms:campArea` | DMS extension |
+| `rights` | `dc:rights` | Dublin Core Elements |
+| `rights.license` | `dcterms:license` | Dublin Core Terms |
+| `rights.holder` | `dcterms:rightsHolder` | Dublin Core Terms |
+| `rights.access_level` | `dms:accessLevel` | DMS extension |
+| `source` | `dc:source` | Dublin Core Elements |
+| `source.contributor` | `dcterms:contributor` | Dublin Core Terms |
+| `source.collection` | `bibo:Collection` | BIBO |
+| `source.original_format` | `dms:originalFormat` | DMS extension |
+| `format` | `dc:format` | Dublin Core Elements |
+| `relation` | `dc:relation` | Dublin Core Elements |
+| `coverage` | `dc:coverage` | Dublin Core Elements |
+| `coverage.start_date` | `schema:startDate` | Schema.org |
+| `coverage.end_date` | `schema:endDate` | Schema.org |
+| `coverage.period` | `dcterms:temporal` | Dublin Core Terms |
+| `schema_version` | `schema:schemaVersion` | Schema.org |
+
+---
+
+## Vocabulary mappings
+
+The `dms.jsonld` context declares prefix mappings for six external vocabularies. These mappings enable DMS records to be published as Linked Data and consumed by RDF-aware systems.
+
+| Vocabulary | Prefix | URI | Used for |
+|---|---|---|---|
+| [Dublin Core](https://www.dublincore.org/) | `dc:`, `dcterms:` | `http://purl.org/dc/elements/1.1/`, `http://purl.org/dc/terms/` | Core metadata fields: title, creator, subject, rights, etc. |
+| [FOAF](https://xmlns.com/foaf/spec/) | `foaf:` | `http://xmlns.com/foaf/0.1/` | Person and agent descriptions (`foaf:name`, `foaf:Person`, `foaf:Image`) |
+| [BIBO](https://www.dublincore.org/specifications/bibo/) | `bibo:` | `http://purl.org/ontology/bibo/` | Bibliographic roles (`bibo:editor`, `bibo:translator`, `bibo:interviewer`) |
+| [Schema.org](https://schema.org/) | `schema:` | `https://schema.org/` | Creative works, places, events, and affiliations |
+| [W3C Geo](https://www.w3.org/2003/01/geo/) | `geo:` | `http://www.w3.org/2003/01/geo/wgs84_pos#` | Geographic coordinates (`geo:lat`, `geo:long`) |
+| [SKOS](https://www.w3.org/2004/02/skos/) | `skos:` | `http://www.w3.org/2004/02/skos/core#` | Subject vocabularies and concept schemes |
+
+---
+
+## JSON-LD context
+
+The file `schema/dms.jsonld` provides a **JSON-LD 1.1 context** that transforms any DMS JSON record into a valid RDF document. Loading the context alongside a record expands each field key into a fully qualified URI.
+
+### Context prefix declarations
+
+```json schema/dms.jsonld (prefixes)
+{
+  "@context": {
+    "@version": 1.1,
+    "dms": "https://github.com/Dzaleka-Connect/Dzaleka-Metadata-Standard/schema#",
+    "dc": "http://purl.org/dc/elements/1.1/",
+    "dcterms": "http://purl.org/dc/terms/",
+    "schema": "https://schema.org/",
+    "foaf": "http://xmlns.com/foaf/0.1/",
+    "bibo": "http://purl.org/ontology/bibo/",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "geo": "http://www.w3.org/2003/01/geo/wgs84_pos#",
+    "skos": "http://www.w3.org/2004/02/skos/core#"
+  }
+}
+```
+
+### Type mappings in JSON-LD
+
+Each value of the `type` enum is mapped to one or more Schema.org, FOAF, and BIBO classes in the `@graph` section of `dms.jsonld`.
+
+| `type` value | Primary class | Additional classes |
+|---|---|---|
+| `story` | `schema:Article` | `foaf:Document`, `bibo:Document` |
+| `photo` | `schema:Photograph` | `foaf:Image` |
+| `document` | `schema:DigitalDocument` | `foaf:Document`, `bibo:Document` |
+| `audio` | `schema:AudioObject` | `bibo:AudioDocument` |
+| `video` | `schema:VideoObject` | `bibo:AudioVisualDocument` |
+| `event` | `schema:Event` | `bibo:Event` |
+| `map` | `schema:Map` | `foaf:Document` |
+| `artwork` | `schema:VisualArtwork` | `foaf:Image` |
+| `site` | `schema:Place` | `schema:LandmarksOrHistoricalBuildings` |
+| `poem` | `schema:CreativeWork` | `bibo:Document` |
+
+### Example: record as JSON-LD
+
+The following shows `examples/story.json` as it would be interpreted when expanded with the DMS JSON-LD context. Field keys resolve to their full URI equivalents.
+
+```json story-as-jsonld.json
+{
+  "@context": "https://github.com/Dzaleka-Connect/Dzaleka-Metadata-Standard/schema/dms.jsonld",
+  "@type": "dms:HeritageRecord",
+  "dc:identifier": "b3e7c8a1-4d5f-6e7a-8b9c-0d1e2f3a4b5c",
+  "dc:title": "Journey to Dzaleka: A Story of Hope",
+  "dc:type": "story",
+  "dc:description": "An oral history account of a Congolese family's journey from Bukavu to Dzaleka Refugee Camp in 2015.",
+  "dc:language": "en",
+  "dc:creator": [
+    {
+      "foaf:name": "Marie Consolée",
+      "dms:creatorRole": "narrator"
+    },
+    {
+      "foaf:name": "Jean-Baptiste Mushimiyimana",
+      "dms:creatorRole": "interviewer",
+      "schema:affiliation": "Dzaleka Digital Heritage Project"
+    }
+  ],
+  "dc:date": {
+    "dcterms:created": "2024-03-15",
+    "dcterms:date": "2015-08-22"
+  },
+  "dc:subject": ["oral history", "displacement", "Congo", "journey", "resilience"],
+  "dcterms:spatial": {
+    "foaf:name": "Dzaleka Refugee Camp",
+    "dms:campArea": "Community Center",
+    "geo:lat": -13.7833,
+    "geo:long": 33.9833
+  },
+  "dc:rights": {
+    "dcterms:license": "CC-BY-NC-4.0",
+    "dms:accessLevel": "public",
+    "dcterms:rightsHolder": "Marie Consolée"
+  },
+  "dc:source": {
+    "dcterms:contributor": "Dzaleka Digital Heritage Project",
+    "bibo:Collection": "Oral Histories 2024",
+    "dms:originalFormat": "audio interview (transcribed)"
+  },
+  "dc:coverage": {
+    "schema:startDate": "2015-01-01",
+    "schema:endDate": "2015-12-31",
+    "dcterms:temporal": "2015 displacement and arrival"
+  },
+  "schema:schemaVersion": "1.0.0"
+}
+```
+
+To export a DMS record as JSON-LD using the CLI:
+
+```bash
+dms export examples/story.json
+```
+
+---
+
+## CSV format
+
+DMS supports importing and exporting records in CSV format for spreadsheet-based workflows. The CSV format uses the same field names as the JSON schema, with nested objects represented as flattened dot-notation columns.
+
+<Tabs>
+  <Tab title="CSV to JSON">
+    Convert a CSV batch file to individual JSON records:
+
+    ```bash
+    dms convert csv2json examples/batch.csv
+    ```
+
+    Each row in the CSV becomes a separate JSON record file. Nested fields such as `location.name`, `rights.license`, and `creator.0.name` are expanded into their corresponding object structures.
+  </Tab>
+  <Tab title="JSON to CSV">
+    Export a JSON record (single object or array) to CSV:
+
+    ```bash
+    dms convert json2csv records/story_b3e7c8a1.json --output export.csv
+    ```
+
+    Nested fields are flattened to `_`-separated column names. Multi-value fields such as `subject` and `creator` are serialised as pipe-separated values.
+  </Tab>
+</Tabs>
+
+---
+
+## JSON Schema validation
+
+The `schema/dms.json` file is a valid **JSON Schema Draft 2020-12** document. Any JSON Schema validator can use it to validate DMS records in any language or platform.
+
+<CodeGroup>
+
+```bash CLI (dms validate)
+dms validate examples/story.json
+```
+
+```python Python (jsonschema)
+import json
+import jsonschema
+
+with open("schema/dms.json") as f:
+    schema = json.load(f)
+
+with open("examples/story.json") as f:
+    record = json.load(f)
+
+jsonschema.validate(instance=record, schema=schema)
+print("Record is valid.")
+```
+
+```javascript JavaScript (ajv)
+import Ajv from "ajv";
+import addFormats from "ajv-formats";
+import schema from "./schema/dms.json" assert { type: "json" };
+import record from "./examples/story.json" assert { type: "json" };
+
+const ajv = new Ajv();
+addFormats(ajv);
+
+const validate = ajv.compile(schema);
+const valid = validate(record);
+console.log(valid ? "Record is valid." : validate.errors);
+```
+
+</CodeGroup>
+
+<Info>
+  The `dms validate` command supports single files and entire directories. Use `dms validate --dir records/` to validate all JSON files in a collection at once.
+</Info>

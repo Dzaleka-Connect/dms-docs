@@ -1,0 +1,110 @@
+---
+title: convert
+description: Convert DMS records between CSV and JSON formats in either direction.
+---
+
+## Synopsis
+
+```bash
+dms convert csv2json FILE [--output PATH]
+dms convert json2csv FILE [--output FILE]
+```
+
+## Description
+
+`dms convert` is a command group with two subcommands for bidirectional conversion between the flat CSV spreadsheet format and structured DMS JSON records.
+
+- **`csv2json`** — reads a CSV where each row is one record and writes a JSON array (or individual files if the output path is a directory).
+- **`json2csv`** — reads a single DMS JSON record or a JSON array and writes a flat CSV file.
+
+Because CSV is inherently flat, nested DMS fields are mapped to `_`-separated column names (e.g., `creator_name`, `rights_access_level`). Multi-value fields use the pipe character (`|`) as a delimiter.
+
+## Subcommands
+
+### csv2json
+
+Convert a CSV file to DMS JSON records.
+
+<ParamField path="FILE" type="path" required>
+  Path to the input `.csv` file. Must exist.
+</ParamField>
+
+<ParamField path="--output" type="path" default="FILE_converted.json">
+  Output path. When omitted, the default is `<stem>_converted.json` in the same directory as the input file (e.g., `batch_converted.json` for `batch.csv`). If you supply a path **without** a `.json` extension, each record is written as a separate file inside that directory.
+</ParamField>
+
+### json2csv
+
+Convert DMS JSON record(s) to CSV format.
+
+<ParamField path="FILE" type="path" required>
+  Path to a DMS JSON file. Can be a single record object or a JSON array. Must exist.
+</ParamField>
+
+<ParamField path="--output" type="path" default="FILE.csv">
+  Output CSV path. When omitted, the file is written alongside the input with the same stem and a `.csv` extension.
+</ParamField>
+
+## CSV column format
+
+The canonical column order for a DMS CSV file:
+
+```text
+id, title, type, description, language,
+creator_name, creator_role,
+date_created, date_event,
+subject,
+location_name, location_area, location_latitude, location_longitude,
+format,
+rights_license, rights_access_level, rights_holder,
+source_contributor, source_collection, source_original_format,
+schema_version
+```
+
+<Note>
+  Multi-value columns (`creator_name`, `creator_role`, `subject`) use `|` (pipe) as a delimiter. For example, two creators are stored as `Alice|Bob` in `creator_name` and `author|photographer` in `creator_role`.
+</Note>
+
+## Examples
+
+<CodeGroup>
+
+```bash CSV to JSON (default output name)
+dms convert csv2json batch.csv
+# writes batch_converted.json
+```
+
+```bash CSV to JSON (custom output)
+dms convert csv2json batch.csv --output records/all.json
+```
+
+```bash CSV to individual JSON files
+dms convert csv2json batch.csv --output records/
+# writes records/story_XXXXXXXX.json, records/poem_YYYYYYYY.json, …
+```
+
+```bash JSON to CSV (default output name)
+dms convert json2csv records/story_abc123.json
+# writes records/story_abc123.csv
+```
+
+```bash JSON array to CSV
+dms convert json2csv batch_converted.json --output export.csv
+```
+
+```bash Round-trip (JSON → CSV → JSON)
+dms convert json2csv records/poem.json --output poem.csv
+dms convert csv2json poem.csv --output poem_roundtrip.json
+```
+
+</CodeGroup>
+
+## Notes
+
+<Warning>
+  The `_converted` suffix in the default output filename is intentional — it prevents `csv2json` from overwriting an existing JSON file that shares the same stem as your CSV input.
+</Warning>
+
+<Tip>
+  When multiple creators are present, ensure `creator_name` and `creator_role` columns have the same number of `|`-separated values so each name is paired with the correct role.
+</Tip>

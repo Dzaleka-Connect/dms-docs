@@ -1,0 +1,109 @@
+---
+title: validate
+description: Validate one or more DMS records against the JSON Schema and report errors and warnings.
+---
+
+## Synopsis
+
+```bash
+dms validate FILE
+dms validate --dir DIRECTORY
+```
+
+## Description
+
+`dms validate` checks DMS JSON records against the official schema using the JSON Schema Draft 2020-12 validator. It reports:
+
+- **Errors** — schema violations that make the record invalid (missing required fields, wrong types, disallowed enum values, etc.).
+- **Warnings** — recommended fields that are absent (`creator`, `date`, `subject`, `location`, `rights`, `source`, `format`). Warnings do not affect the exit code.
+
+Pass a single `FILE` to validate one record, or use `--dir` to validate every `.json` file found in a directory.
+
+## Options
+
+<ParamField path="FILE" type="path">
+  Path to a single `.json` file to validate. Optional when `--dir` is used.
+</ParamField>
+
+<ParamField path="--dir" type="path">
+  Directory containing `.json` files. All files are validated and a batch summary is printed at the end.
+</ParamField>
+
+## Exit codes
+
+| Code | Meaning |
+| ---- | ------- |
+| `0`  | All validated records are valid. |
+| `1`  | One or more records are invalid, or neither `FILE` nor `--dir` was provided. |
+
+<Note>
+  The non-zero exit code on failure makes `dms validate` safe to use in CI pipelines. Any invalid record will fail the pipeline step.
+</Note>
+
+## Terminal output
+
+**Valid record:**
+
+```text
+╭──────────────────────────────────────────────╮
+│ ✓ VALID  records/poem_3f8a1c2b.json           │
+╰──────────────────────────────────────────────╯
+  ⚠ Recommended field 'Source' is not provided.
+```
+
+**Invalid record:**
+
+```text
+╭──────────────────────────────────────────────╮
+│ ✗ INVALID  records/broken.json               │
+╰──────────────────────────────────────────────╯
+ Field            Issue
+ ─────────────────────────────────────────────
+ Type             Invalid value 'photograph'. Allowed: story, photo, document, …
+ Description      Required field 'Description' is missing.
+```
+
+**Batch summary (directory mode):**
+
+```text
+╭──────────────────────────────╮
+│ Batch Validation Summary     │
+│                              │
+│   Total files:  12           │
+│   Valid:        11           │
+│   Invalid:      1            │
+╰──────────────────────────────╯
+```
+
+## Examples
+
+<CodeGroup>
+
+```bash Validate a single file
+dms validate records/story_abc123.json
+```
+
+```bash Validate all records in a directory
+dms validate --dir records/
+```
+
+```bash CI — fail the build on any invalid record
+dms validate --dir records/ || exit 1
+```
+
+```bash Validate and capture exit code
+dms validate records/poem.json
+echo "Exit code: $?"
+```
+
+</CodeGroup>
+
+## Notes
+
+<Tip>
+  Add `dms validate --dir records/` as a pre-commit hook or CI step to catch schema violations before they are merged.
+</Tip>
+
+<Warning>
+  `dms validate` only checks `.json` files. Files with other extensions in the directory are silently skipped.
+</Warning>

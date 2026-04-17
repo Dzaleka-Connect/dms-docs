@@ -1,0 +1,184 @@
+---
+title: "Creating Records"
+description: "Create new DMS heritage metadata records using the web UI or the interactive CLI wizard."
+keywords: ["dms", "create", "init", "record", "wizard", "web ui", "vault"]
+---
+
+DMS gives you two ways to create a new heritage metadata record: the **DMS Vault** web interface for a guided, form-based experience, or the **`dms init` CLI wizard** for a fully terminal-based workflow. Both produce the same JSON output conforming to the DMS schema.
+
+<Tabs>
+  <Tab title="Web UI (DMS Vault)">
+    The DMS Vault is a dark-themed local web application that runs in your browser. It provides live validation feedback as you fill in fields, and makes it easy to add multi-value entries like creators and subject tags.
+
+    <Steps>
+      <Step title="Launch the server">
+        Start the web server with `dms web`, pointing it at the directory where records will be saved:
+
+        ```bash
+        dms web --port 8080 --dir records/
+        ```
+
+        DMS will automatically open `http://localhost:8080` in your default browser. To suppress auto-open:
+
+        ```bash
+        dms web --no-open
+        ```
+      </Step>
+
+      <Step title="Fill in the metadata form">
+        The Vault presents all DMS fields as a structured form. Required fields (`id`, `title`, `type`, `description`, `language`) are clearly marked. You can:
+
+        - Add multiple creators with individual name, role, and affiliation fields
+        - Attach subject tags one at a time
+        - Set geographic coordinates using a point picker
+        - Choose a rights license and access level from dropdown menus
+      </Step>
+
+      <Step title="Validate and save">
+        The form validates your record against the DMS schema in real time, highlighting any errors before you save. Once the record is valid, click **Save** to write the JSON file into the `--dir` directory you specified.
+      </Step>
+
+      <Step title="Copy raw JSON or JSON-LD">
+        The Vault also lets you copy the raw JSON or the linked-data JSON-LD representation of any record to your clipboard, useful for publishing or debugging.
+      </Step>
+    </Steps>
+  </Tab>
+
+  <Tab title="CLI wizard">
+    The `dms init` command launches a step-by-step terminal prompt that walks you through every field.
+
+    <Steps>
+      <Step title="Start the wizard">
+        Run `dms init` to begin. The wizard generates a UUID automatically and prompts you for each field in order:
+
+        ```bash
+        dms init
+        ```
+
+        To skip the type selection prompt, pass `--type` directly:
+
+        ```bash
+        dms init --type story
+        ```
+
+        To write the record to a specific file without being asked:
+
+        ```bash
+        dms init --output records/my-story.json
+        ```
+      </Step>
+
+      <Step title="Answer the prompts">
+        The wizard covers all standard DMS fields. Required fields (`title`, `type`, `description`, `language`) are always prompted. Optional fields (`creator`, `location`, `rights`, `source`) are gated behind `y/n` confirmations so you can skip what you don't need.
+
+        Available heritage types shown during the wizard:
+
+        ```
+        story, photo, document, audio, video, event, map, artwork, site, poem
+        ```
+
+        Available creator roles:
+
+        ```
+        author, photographer, interviewer, interviewee, narrator, artist,
+        muralist, sculptor, poet, curator, recorder, editor, translator,
+        organizer, contributor
+        ```
+      </Step>
+
+      <Step title="Review and save">
+        When all prompts are complete, the wizard prints the full generated JSON in a panel and asks where to save the file. If you already passed `--output`, it writes there directly.
+      </Step>
+    </Steps>
+  </Tab>
+</Tabs>
+
+## Starting from a template
+
+The fastest way to create a new record is to copy one of the bundled examples and edit it:
+
+```bash
+cp examples/story.json my-record.json
+```
+
+Then open `my-record.json` in any text editor and update the fields.
+
+<Warning>
+  Always replace the `id` field with a new UUID for each record. Every DMS record must have a globally unique identifier. You can generate one with `python3 -c "import uuid; print(uuid.uuid4())"`.
+</Warning>
+
+## Complete record example
+
+The following is the full `examples/story.json` from the DMS repository, showing every supported field:
+
+```json story.json
+{
+  "id": "b3e7c8a1-4d5f-6e7a-8b9c-0d1e2f3a4b5c",
+  "title": "Journey to Dzaleka: A Story of Hope",
+  "type": "story",
+  "description": "An oral history account of a Congolese family's journey from Bukavu to Dzaleka Refugee Camp in 2015. The narrator describes the challenges of displacement, the experience of crossing borders, and the sense of community found upon arrival at Dzaleka. This story captures themes of resilience, loss, and rebuilding life in a new place.",
+  "language": "en",
+  "creator": [
+    {
+      "name": "Marie Consolée",
+      "role": "narrator"
+    },
+    {
+      "name": "Jean-Baptiste Mushimiyimana",
+      "role": "interviewer",
+      "affiliation": "Dzaleka Digital Heritage Project"
+    }
+  ],
+  "date": {
+    "created": "2024-03-15",
+    "event_date": "2015-08-22"
+  },
+  "subject": [
+    "oral history",
+    "displacement",
+    "Congo",
+    "journey",
+    "resilience",
+    "community",
+    "arrival"
+  ],
+  "location": {
+    "name": "Dzaleka Refugee Camp",
+    "area": "Community Center",
+    "latitude": -13.7833,
+    "longitude": 33.9833
+  },
+  "format": "text/plain",
+  "rights": {
+    "license": "CC-BY-NC-4.0",
+    "access_level": "public",
+    "holder": "Marie Consolée"
+  },
+  "source": {
+    "contributor": "Dzaleka Digital Heritage Project",
+    "collection": "Oral Histories 2024",
+    "original_format": "audio interview (transcribed)"
+  },
+  "coverage": {
+    "start_date": "2015-01-01",
+    "end_date": "2015-12-31",
+    "period": "2015 displacement and arrival"
+  },
+  "schema_version": "1.0.0"
+}
+```
+
+<Note>
+  The `date.created` field records when the metadata record itself was created. Use `date.event_date` to capture when the original event or artefact originates from — in this example, August 2015 is when the journey took place, while March 2024 is when the record was documented.
+</Note>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Validating records" icon="circle-check" href="/guides/validating-records">
+    Check your new record against the DMS schema before adding it to your archive.
+  </Card>
+  <Card title="Field guide" icon="book-open" href="/reference/field-guide">
+    Detailed definitions and constraints for every DMS field.
+  </Card>
+</CardGroup>

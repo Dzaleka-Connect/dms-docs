@@ -1,0 +1,221 @@
+---
+title: "Linked Data Export"
+description: "Export DMS records as JSON-LD to publish heritage metadata on the semantic web and integrate with library catalogues and linked open data portals."
+keywords: ["dms", "json-ld", "linked data", "semantic web", "dublin core", "foaf", "schema.org", "export"]
+---
+
+JSON-LD (JSON for Linked Data) is a W3C standard that adds semantic meaning to JSON by associating each field with a globally recognised vocabulary term. Exporting your DMS records as JSON-LD makes them machine-readable by search engines, library catalogue systems, and linked open data portals — without changing how they look to a human reader.
+
+## Why it matters
+
+A plain DMS JSON record uses field names like `creator` and `title`. A JSON-LD export maps those same fields to precise URIs from established vocabularies:
+
+- `creator` → `http://purl.org/dc/elements/1.1/creator`
+- `title` → `http://purl.org/dc/elements/1.1/title`
+- `name` (on a creator) → `http://xmlns.com/foaf/0.1/name`
+
+This means any application that understands those vocabularies can consume your metadata without custom parsing.
+
+## Exporting a single record
+
+```bash
+dms export records/story_b3e7c8a1.json
+```
+
+By default the output file is placed next to the input with a `.jsonld` extension:
+
+```
+records/story_b3e7c8a1.jsonld
+```
+
+Use `--output` to choose a different path:
+
+```bash
+dms export records/story_b3e7c8a1.json --output exports/story.jsonld
+```
+
+## Exporting an entire collection
+
+Pass `--dir` to export every `.json` file in a directory as a single JSON-LD `@graph` document:
+
+```bash
+dms export --dir records/
+```
+
+This writes a `collection.jsonld` file into the directory. Each record becomes a node in the `@graph` array, sharing a single top-level `@context` block:
+
+```bash
+dms export --dir records/ --output exports/all-records.jsonld
+```
+
+## Vocabulary mappings
+
+DMS maps its fields to six linked data vocabularies defined in `schema/dms.jsonld`:
+
+<AccordionGroup>
+  <Accordion title="Dublin Core (dc / dcterms)">
+    The core bibliographic vocabulary. Used for the fundamental descriptive fields:
+
+    | DMS field | Mapped to |
+    |---|---|
+    | `id` | `dc:identifier` |
+    | `title` | `dc:title` |
+    | `description` | `dc:description` |
+    | `type` | `dc:type` |
+    | `language` | `dc:language` |
+    | `format` | `dc:format` |
+    | `subject` | `dc:subject` |
+    | `rights` | `dc:rights` |
+    | `source` | `dc:source` |
+    | `date.created` | `dcterms:created` |
+    | `date.event_date` | `dcterms:date` |
+    | `rights.license` | `dcterms:license` |
+    | `rights.holder` | `dcterms:rightsHolder` |
+    | `location` | `dcterms:spatial` |
+  </Accordion>
+
+  <Accordion title="FOAF (Friend of a Friend)">
+    Used to describe people involved in creating or contributing to a record:
+
+    | DMS field | Mapped to |
+    |---|---|
+    | `creator[].name` | `foaf:name` |
+    | each creator node | `@type: foaf:Person` |
+
+    Role mappings to FOAF include `author` → `foaf:maker`.
+  </Accordion>
+
+  <Accordion title="BIBO (Bibliographic Ontology)">
+    Provides document-type classifications and roles specific to bibliographic resources:
+
+    | DMS type | BIBO mapping |
+    |---|---|
+    | `story`, `document`, `poem` | `bibo:Document` |
+    | `audio` | `bibo:AudioDocument` |
+    | `video` | `bibo:AudioVisualDocument` |
+    | `event` | `bibo:Event` |
+
+    Creator roles include `interviewer` → `bibo:interviewer`, `editor` → `bibo:editor`, `translator` → `bibo:translator`.
+
+    | DMS field | Mapped to |
+    |---|---|
+    | `source.collection` | `bibo:Collection` |
+  </Accordion>
+
+  <Accordion title="Schema.org">
+    Provides rich type mappings recognised by Google, Bing, and major catalogues:
+
+    | DMS type | Schema.org @type |
+    |---|---|
+    | `story` | `schema:Article` |
+    | `photo` | `schema:Photograph` |
+    | `document` | `schema:DigitalDocument` |
+    | `audio` | `schema:AudioObject` |
+    | `video` | `schema:VideoObject` |
+    | `event` | `schema:Event` |
+    | `map` | `schema:Map` |
+    | `artwork` | `schema:VisualArtwork` |
+    | `site` | `schema:Place` |
+    | `poem` | `schema:CreativeWork` |
+
+    Additional field mappings: `creator[].affiliation` → `schema:affiliation`, `coverage.start_date` → `schema:startDate`, `coverage.end_date` → `schema:endDate`.
+  </Accordion>
+
+  <Accordion title="W3C Geo">
+    Used for geographic coordinates on the `location` object:
+
+    | DMS field | Mapped to |
+    |---|---|
+    | `location.latitude` | `geo:lat` |
+    | `location.longitude` | `geo:long` |
+  </Accordion>
+
+  <Accordion title="SKOS (Simple Knowledge Organization System)">
+    The SKOS namespace is included in the context for future use in classifying subject tags as concept scheme entries, enabling interoperability with controlled vocabulary systems and thesauri.
+  </Accordion>
+</AccordionGroup>
+
+## Example JSON-LD output
+
+The following shows what the `examples/story.json` record looks like after export. The `@context` block is sourced directly from `schema/dms.jsonld`:
+
+```json story_b3e7c8a1.jsonld
+{
+  "@context": {
+    "dms": "https://github.com/Dzaleka-Connect/Dzaleka-Metadata-Standard/schema#",
+    "dc": "http://purl.org/dc/elements/1.1/",
+    "dcterms": "http://purl.org/dc/terms/",
+    "schema": "https://schema.org/",
+    "foaf": "http://xmlns.com/foaf/0.1/",
+    "bibo": "http://purl.org/ontology/bibo/",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "geo": "http://www.w3.org/2003/01/geo/wgs84_pos#",
+    "skos": "http://www.w3.org/2004/02/skos/core#"
+  },
+  "@type": ["dms:HeritageRecord", "schema:Article"],
+  "@id": "urn:dms:b3e7c8a1-4d5f-6e7a-8b9c-0d1e2f3a4b5c",
+  "dc:identifier": "b3e7c8a1-4d5f-6e7a-8b9c-0d1e2f3a4b5c",
+  "title": "Journey to Dzaleka: A Story of Hope",
+  "type": "story",
+  "description": "An oral history account of a Congolese family's journey from Bukavu to Dzaleka Refugee Camp in 2015.",
+  "language": "en",
+  "creator": [
+    {
+      "@type": "foaf:Person",
+      "name": "Marie Consolée",
+      "role": "narrator"
+    },
+    {
+      "@type": "foaf:Person",
+      "name": "Jean-Baptiste Mushimiyimana",
+      "role": "interviewer",
+      "affiliation": "Dzaleka Digital Heritage Project"
+    }
+  ],
+  "date": {
+    "created": "2024-03-15",
+    "event_date": "2015-08-22"
+  },
+  "subject": ["oral history", "displacement", "Congo", "journey", "resilience", "community", "arrival"],
+  "location": {
+    "@type": "schema:Place",
+    "name": "Dzaleka Refugee Camp",
+    "area": "Community Center",
+    "latitude": -13.7833,
+    "longitude": 33.9833
+  },
+  "format": "text/plain",
+  "rights": {
+    "license": "CC-BY-NC-4.0",
+    "access_level": "public",
+    "holder": "Marie Consolée"
+  },
+  "schema_version": "1.0.0"
+}
+```
+
+Key differences from the plain JSON record:
+
+- `@context` declares all vocabulary prefix bindings
+- `@type` is set to both `dms:HeritageRecord` and the appropriate Schema.org type (`schema:Article` for a story)
+- `@id` is a `urn:dms:` URI derived from the record's UUID
+- `id` is preserved as `dc:identifier`
+- Each creator gets `"@type": "foaf:Person"`
+- The `location` object gets `"@type": "schema:Place"`
+
+## Use cases
+
+<CardGroup cols={2}>
+  <Card title="Library catalogues" icon="building-columns">
+    Dublin Core and BIBO mappings make DMS records directly importable into library management systems such as DSpace, Omeka, and Koha.
+  </Card>
+  <Card title="Linked open data portals" icon="globe">
+    Publish a `collection.jsonld` graph document to a SPARQL endpoint or a static open data portal for query by the wider research community.
+  </Card>
+  <Card title="Search engine indexing" icon="magnifying-glass">
+    Schema.org `@type` values allow Google Knowledge Graph and Bing to index heritage records as structured data, improving discoverability.
+  </Card>
+  <Card title="Interoperability" icon="arrows-left-right">
+    Shared vocabulary URIs mean DMS records can be joined with datasets from other institutions that use Dublin Core or FOAF without custom data-mapping work.
+  </Card>
+</CardGroup>

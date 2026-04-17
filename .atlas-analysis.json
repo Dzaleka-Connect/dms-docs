@@ -1,0 +1,98 @@
+{
+  "projectType": "cli-tool",
+  "projectName": "Dzaleka Metadata Standard",
+  "projectDescription": "An open-source metadata specification and Python CLI toolkit for describing, organising, and sharing digital heritage content from Dzaleka Refugee Camp.",
+  "theme": "palm",
+  "primaryColor": "#94cb04",
+  "lightColor": "#545454",
+  "darkColor": null,
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "quickstart",
+              "installation"
+            ]
+          },
+          {
+            "group": "Guides",
+            "pages": [
+              "guides/creating-records",
+              "guides/validating-records",
+              "guides/searching-and-stats",
+              "guides/csv-import-export",
+              "guides/linked-data-export"
+            ]
+          },
+          {
+            "group": "Best Practices",
+            "pages": [
+              "best-practices/metadata-quality",
+              "best-practices/rights-and-access",
+              "best-practices/oral-histories"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Reference",
+        "groups": [
+          {
+            "group": "Schema",
+            "pages": [
+              "reference/schema-overview",
+              "reference/field-guide",
+              "reference/item-types",
+              "reference/interoperability"
+            ]
+          },
+          {
+            "group": "CLI Commands",
+            "pages": [
+              "reference/commands/init",
+              "reference/commands/validate",
+              "reference/commands/convert",
+              "reference/commands/search",
+              "reference/commands/export",
+              "reference/commands/report",
+              "reference/commands/stats",
+              "reference/commands/web"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Dublin Core-compatible JSON Schema (Draft 2020-12) for heritage metadata",
+    "Interactive CLI wizard for creating metadata records (dms init)",
+    "Schema validation for single files and entire directories (dms validate)",
+    "CSV batch import/export with pipe-separated multi-value columns",
+    "JSON-LD export for semantic web and linked data publishing",
+    "Full-text and filtered search across metadata archives (dms search)",
+    "Collection analytics and statistics (dms stats)",
+    "Browsable HTML/Markdown catalogue generation (dms report)",
+    "Local web UI (DMS Vault) for GUI-driven record management (dms web)",
+    "Field-level record diffing (dms diff)",
+    "Support for 10 heritage item types: story, photo, document, audio, video, event, map, artwork, site, poem",
+    "Dzaleka-specific extensions: camp area fields, community-only access level"
+  ],
+  "publicApiSurface": [
+    "dms init [--type TYPE] [--output FILE]",
+    "dms validate FILE | --dir DIRECTORY",
+    "dms convert csv2json FILE [-o OUTPUT]",
+    "dms convert json2csv FILE [-o OUTPUT]",
+    "dms export FILE | --dir DIRECTORY [-o OUTPUT]",
+    "dms search --dir DIR [--type] [--subject] [--creator] [--language] [--from] [--to] [-q QUERY]",
+    "dms diff FILE_A FILE_B [--all]",
+    "dms report --dir DIR [--format html|md] [--output FILE] [--title TITLE]",
+    "dms stats --dir DIRECTORY",
+    "dms info",
+    "dms web [--port PORT] [--dir DIR] [--no-open]"
+  ]
+}

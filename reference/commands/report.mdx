@@ -1,0 +1,87 @@
+---
+title: report
+description: Generate a browsable HTML or Markdown catalogue from a directory of DMS records.
+---
+
+## Synopsis
+
+```bash
+dms report --dir DIRECTORY [--format html|md] [--output FILE] [--title TITLE]
+```
+
+## Description
+
+`dms report` reads every `.json` file in a directory and compiles a browsable catalogue. The default output is a self-contained dark-themed HTML page (`report.html`) that requires no external dependencies. A Markdown variant (`report.md`) is available for embedding in wikis, READMEs, or static site generators.
+
+**HTML report features:**
+- Summary statistics (total records, type count, contributor count, language count)
+- Per-type badge strip
+- Card grid grouped by heritage type with title, description, creator, date, location, language, license, and subject tags
+- Responsive layout — collapses to a single column on narrow viewports
+
+**Markdown report features:**
+- Records grouped by type as `##` sections
+- Each record as a `###` heading with a bullet-list of metadata fields
+- Quoted description paragraph
+
+## Options
+
+<ParamField path="--dir" type="path" required>
+  Directory containing DMS `.json` records. Must exist and be a directory.
+</ParamField>
+
+<ParamField path="--format" type="string" default="html">
+  Output format. Accepted values: `html`, `md`. Case-insensitive.
+</ParamField>
+
+<ParamField path="--output" type="path" default="derived from input">
+  Output file path.
+  - HTML: defaults to `DIRECTORY/report.html`
+  - Markdown: defaults to `DIRECTORY/report.md`
+</ParamField>
+
+<ParamField path="--title" type="string" default="Dzaleka Heritage Collection">
+  Title used in the report header and HTML `<title>` tag.
+</ParamField>
+
+## Examples
+
+<CodeGroup>
+
+```bash Default HTML report
+dms report --dir records/
+# writes records/report.html
+```
+
+```bash Markdown report
+dms report --dir records/ --format md
+# writes records/report.md
+```
+
+```bash Custom title
+dms report --dir records/ --title "Dzaleka Arts Archive 2024"
+```
+
+```bash Custom output path
+dms report --dir records/ --output docs/catalogue.html
+```
+
+```bash Markdown with custom title and output
+dms report --dir records/ --format md --title "Heritage Index" --output site/index.md
+```
+
+</CodeGroup>
+
+## Notes
+
+<Tip>
+  The HTML report is entirely self-contained — all styles are inlined. You can open it directly in a browser, email it, or host it as a static file without any build step.
+</Tip>
+
+<Note>
+  Records that contain a top-level JSON array are supported. Each element of the array is treated as a separate record in the catalogue.
+</Note>
+
+<Warning>
+  Files with JSON parse errors are silently skipped. Run `dms validate --dir DIRECTORY` first to identify and fix any malformed records before generating a report.
+</Warning>

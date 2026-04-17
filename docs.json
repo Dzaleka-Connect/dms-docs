@@ -1,0 +1,100 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "name": "Dzaleka Metadata Standard",
+  "theme": "palm",
+  "colors": {
+    "primary": "#94cb04",
+    "light": "#545454",
+    "dark": "#94cb04"
+  },
+  "favicon": "https://media.brand.dev/288cc7c4-5cef-4376-950b-bdf0083eedae.png",
+  "navbar": {
+    "primary": {
+      "type": "github",
+      "href": "https://github.com/Dzaleka-Connect/Dzaleka-Metadata-Standard"
+    }
+  },
+  "footer": {
+    "socials": {
+      "github": "https://github.com/Dzaleka-Connect/Dzaleka-Metadata-Standard",
+      "x": "https://twitter.com/dzalekaconnect",
+      "website": "https://services.dzaleka.com/",
+      "instagram": "https://instagram.com/dzalekaonline",
+      "facebook": "https://www.facebook.com/dzalekaonline/"
+    }
+  },
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "quickstart",
+              "installation"
+            ]
+          },
+          {
+            "group": "Guides",
+            "pages": [
+              "guides/creating-records",
+              "guides/validating-records",
+              "guides/searching-and-stats",
+              "guides/csv-import-export",
+              "guides/linked-data-export"
+            ]
+          },
+          {
+            "group": "Best Practices",
+            "pages": [
+              "best-practices/metadata-quality",
+              "best-practices/rights-and-access",
+              "best-practices/oral-histories"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Reference",
+        "groups": [
+          {
+            "group": "Schema",
+            "pages": [
+              "reference/schema-overview",
+              "reference/field-guide",
+              "reference/item-types",
+              "reference/interoperability"
+            ]
+          },
+          {
+            "group": "CLI Commands",
+            "pages": [
+              "reference/commands/init",
+              "reference/commands/validate",
+              "reference/commands/convert",
+              "reference/commands/search",
+              "reference/commands/export",
+              "reference/commands/report",
+              "reference/commands/stats",
+              "reference/commands/info",
+              "reference/commands/web"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "seo": {
+    "indexing": "all",
+    "metatags": {
+      "canonical": "https://dms.dzaleka.com/"
+  },
+  "api": {
+    "playground": {
+      "display": "interactive"
+    }
+  }
+  }
+}
